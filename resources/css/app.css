@@ -1,0 +1,144 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+
+@theme {
+    --font-display: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+    --font-body: 'Manrope', 'Segoe UI', sans-serif;
+    --font-sans: 'Manrope', 'Segoe UI', sans-serif;
+
+    --color-brand-50: #f5f3fa;
+    --color-brand-100: #e9e5f5;
+    --color-brand-500: #5a4694;
+    --color-brand-700: #28166b;
+    --color-brand-800: #1c0f4d;
+    --color-brand-950: #120933;
+
+    --color-ink-50: #fafafb;
+    --color-ink-200: #e5e3e8;
+    --color-ink-500: #6b6972;
+    --color-ink-800: #242329;
+    --color-ink-950: #0a0a0b;
+}
+
+@layer base {
+    :root {
+        color-scheme: light;
+        scroll-behavior: smooth;
+    }
+
+    body {
+        @apply bg-ink-50 font-body text-ink-800 antialiased;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-display text-ink-950;
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    a,
+    button {
+        @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2;
+    }
+
+    button {
+        cursor: pointer;
+    }
+
+    [hidden] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .site-container {
+        width: min(100% - 2.5rem, 80rem);
+        margin-inline: auto;
+    }
+
+    .site-container-wide {
+        width: min(100% - 2.5rem, 90rem);
+        margin-inline: auto;
+    }
+
+    .section-space {
+        @apply py-16 md:py-20 lg:py-28;
+    }
+
+    .brand-media {
+        @apply relative isolate overflow-hidden rounded-[1.5rem] border border-brand-100 bg-brand-50;
+    }
+
+    .brand-media::before,
+    .brand-media::after {
+        content: '';
+        position: absolute;
+        z-index: -1;
+        border: 1px solid rgb(90 70 148 / 24%);
+        border-radius: 999px;
+    }
+
+    .brand-media::before {
+        width: 18rem;
+        height: 18rem;
+        top: -8rem;
+        right: -5rem;
+    }
+
+    .brand-media::after {
+        width: 12rem;
+        height: 12rem;
+        bottom: -5rem;
+        left: -4rem;
+    }
+
+    .eyebrow {
+        @apply mb-4 block text-xs font-bold uppercase tracking-[0.16em] text-brand-700;
+    }
+
+    .text-link {
+        @apply inline-flex min-h-11 items-center gap-2 font-semibold text-brand-700 transition-colors hover:text-brand-800;
+    }
+}
+
+@media (min-width: 48rem) {
+    .site-container,
+    .site-container-wide {
+        width: min(100% - 4rem, var(--container-max, 80rem));
+    }
+
+    .site-container-wide {
+        --container-max: 90rem;
+    }
+}
+
+@media (min-width: 64rem) {
+    .site-container,
+    .site-container-wide {
+        width: min(100% - 6rem, var(--container-max, 80rem));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}

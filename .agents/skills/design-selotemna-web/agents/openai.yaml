@@ -1,0 +1,15 @@
+interface:
+  display_name: Selotemna Web Design
+  short_description: Design Selotemna’s corporate property website
+  brand_color: '#28166B'
+  default_prompt: Use $design-selotemna-web to design or review Selotemna’s public
+    real-estate website using its approved brand system.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
