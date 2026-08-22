@@ -164,12 +164,14 @@ The approved phase completed the following work.
 The current repository contains:
 
 - a shared Blade layout;
-- reusable header, footer, button, division, project tabs/cards, FAQ, contact, CTA, and mobile-contact components;
+- reusable header, footer, button, division, project tabs/cards, FAQ, contact, and CTA components;
 - Tailwind brand tokens;
 - Sora and Manrope;
-- accessible desktop dropdown, mobile drawer, project tabs, and FAQ JavaScript;
+- accessible desktop dropdown, viewport-level mobile drawer, project tabs, and FAQ JavaScript;
 - conditional contact actions;
 - a complete Omu Creek detail page and concise homepage summary.
+
+The mobile drawer contains Book an Inspection as a normal navigation link. There is no persistent mobile contact bar; verified phone and WhatsApp links appear in the drawer only when configured.
 
 Keep these foundations and the content hierarchy aligned in future changes.
 

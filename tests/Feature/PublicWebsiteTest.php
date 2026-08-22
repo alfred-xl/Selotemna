@@ -88,20 +88,28 @@ it('marks route-appropriate navigation links as current', function () {
     expect((bool) preg_match('/href="'.$divisionUrl.'"\s+class="dropdown-link"\s+data-divisions-link\s+aria-current="page"/s', $divisionPage))->toBeTrue();
 });
 
-it('provides an accessible divisions dropdown and mobile drawer hooks', function () {
+it('provides accessible desktop navigation and a viewport-level mobile drawer', function () {
     $content = $this->get(route('home'))->getContent();
+    $inspectionUrl = preg_quote(route('inspections.create'), '/');
 
     expect($content)->toContain('data-divisions-toggle')
         ->toContain('aria-controls="desktop-divisions-menu"')
         ->toContain('aria-expanded="false"')
         ->toContain('data-divisions-menu')
         ->toContain('aria-controls="mobile-navigation"')
-        ->toContain('aria-modal="true"');
+        ->toContain('aria-modal="true"')
+        ->toContain('data-menu-root inert')
+        ->not->toContain('data-mobile-contact-bar')
+        ->and(strpos($content, '</header>'))->toBeLessThan(strpos($content, 'data-menu-root'))
+        ->and((bool) preg_match('/href="'.$inspectionUrl.'"\s+class="mobile-nav-link"[^>]*data-menu-link/s', $content))->toBeTrue();
 
     $script = file_get_contents(resource_path('js/app.js'));
     expect($script)->toContain("event.key === 'Escape'")
         ->toContain("event.key !== 'ArrowDown'")
-        ->toContain('!dropdown.contains(event.target)');
+        ->toContain('!dropdown.contains(event.target)')
+        ->toContain("menuRoot.removeAttribute('inert')")
+        ->toContain("menuRoot.setAttribute('inert', '')")
+        ->not->toContain('mobileContactBar');
 });
 
 it('shows exactly two primary homepage divisions and no retired architecture', function () {

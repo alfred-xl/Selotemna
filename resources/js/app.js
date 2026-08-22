@@ -3,35 +3,26 @@ const menuPanel = document.querySelector('[data-menu-panel]');
 const menuOpen = document.querySelector('[data-menu-open]');
 const menuClose = document.querySelector('[data-menu-close]');
 const menuBackdrop = document.querySelector('[data-menu-backdrop]');
-const mobileContactBar = document.querySelector('[data-mobile-contact-bar]');
-
-let footerIsVisible = false;
-let menuIsOpen = false;
-
-const updateMobileContactBar = () => {
-    if (!mobileContactBar) return;
-
-    const shouldHide = footerIsVisible || menuIsOpen;
-    mobileContactBar.classList.toggle('translate-y-full', shouldHide);
-    mobileContactBar.classList.toggle('pointer-events-none', shouldHide);
-    mobileContactBar.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
-    mobileContactBar.toggleAttribute('inert', shouldHide);
-};
 
 if (menuRoot && menuPanel && menuOpen && menuClose && menuBackdrop) {
     let closeTimer;
+    let menuIsOpen = false;
+    let previousBodyOverflow = '';
 
     const desktopBreakpoint = window.matchMedia('(min-width: 64rem)');
     const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
     const openMenu = () => {
         window.clearTimeout(closeTimer);
+        if (menuIsOpen) return;
+
         menuIsOpen = true;
+        previousBodyOverflow = document.body.style.overflow;
         menuRoot.classList.remove('hidden');
+        menuRoot.removeAttribute('inert');
         menuRoot.setAttribute('aria-hidden', 'false');
         menuOpen.setAttribute('aria-expanded', 'true');
         document.body.style.overflow = 'hidden';
-        updateMobileContactBar();
 
         window.requestAnimationFrame(() => {
             menuPanel.classList.remove('translate-x-full');
@@ -41,12 +32,13 @@ if (menuRoot && menuPanel && menuOpen && menuClose && menuBackdrop) {
 
     const closeMenu = ({ immediate = false, returnFocus = true } = {}) => {
         window.clearTimeout(closeTimer);
+        if (!menuIsOpen && !immediate) return;
+
         menuIsOpen = false;
         menuPanel.classList.add('translate-x-full');
         menuOpen.setAttribute('aria-expanded', 'false');
         menuRoot.setAttribute('aria-hidden', 'true');
-        document.body.style.removeProperty('overflow');
-        updateMobileContactBar();
+        document.body.style.overflow = previousBodyOverflow;
 
         if (returnFocus && !desktopBreakpoint.matches) {
             menuOpen.focus();
@@ -54,11 +46,13 @@ if (menuRoot && menuPanel && menuOpen && menuClose && menuBackdrop) {
 
         if (immediate) {
             menuRoot.classList.add('hidden');
+            menuRoot.setAttribute('inert', '');
             return;
         }
 
         closeTimer = window.setTimeout(() => {
             menuRoot.classList.add('hidden');
+            menuRoot.setAttribute('inert', '');
         }, 300);
     };
 
@@ -66,10 +60,12 @@ if (menuRoot && menuPanel && menuOpen && menuClose && menuBackdrop) {
     menuClose.addEventListener('click', () => closeMenu());
     menuBackdrop.addEventListener('click', () => closeMenu());
     menuRoot.querySelectorAll('[data-menu-link]').forEach((link) => {
-        link.addEventListener('click', () => closeMenu());
+        link.addEventListener('click', () => closeMenu({ returnFocus: false }));
     });
 
     menuRoot.addEventListener('keydown', (event) => {
+        if (!menuIsOpen) return;
+
         if (event.key === 'Escape') {
             closeMenu();
             return;
@@ -209,16 +205,3 @@ document.querySelectorAll('[data-faq-group]').forEach((group) => {
         });
     });
 });
-
-const footer = document.querySelector('[data-site-footer]');
-
-if (footer && mobileContactBar && 'IntersectionObserver' in window) {
-    const footerObserver = new IntersectionObserver(([entry]) => {
-        footerIsVisible = entry.isIntersecting;
-        updateMobileContactBar();
-    }, { threshold: 0.05 });
-
-    footerObserver.observe(footer);
-}
-
-updateMobileContactBar();

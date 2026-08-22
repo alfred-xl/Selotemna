@@ -14,7 +14,7 @@
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="min-h-screen overflow-x-hidden pb-20 lg:pb-0">
+    <body class="min-h-screen overflow-x-hidden">
         <a href="#main-content" class="fixed left-4 top-4 z-[100] -translate-y-24 rounded-xl bg-white px-4 py-3 font-semibold text-brand-700 shadow-lg transition-transform focus:translate-y-0">
             Skip to content
         </a>
@@ -26,6 +26,5 @@
         </main>
 
         <x-site.footer :contact="$contact" />
-        <x-site.mobile-contact-bar :contact="$contact" />
     </body>
 </html>
