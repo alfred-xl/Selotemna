@@ -56,7 +56,7 @@ Minimum target size is 44px. Link labels should describe the action.
 
 ## Navigation
 
-Desktop navigation includes Home, About Us, Properties, Services, and Contact. Properties targets Omu Creek until a catalogue route exists. Mobile navigation uses a right-side drawer with focus containment, Escape and backdrop dismissal, scroll locking, and focus return.
+Desktop navigation includes Home, About, an accessible Divisions menu, Projects, FAQ, Contact, and Book an Inspection. The Divisions menu links to Real Estate Development and Engineering & Construction. Mobile navigation uses a right-side drawer with focus containment, Escape and backdrop dismissal, scroll locking, and focus return.
 
 Never use an empty hash target.
 

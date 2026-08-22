@@ -1,75 +1,45 @@
 ---
 name: design-selotemna-web
-description: Design, build, review, or refine Selotemna’s public-facing Laravel and Blade website, including its corporate homepage, property opportunities, service pages, inspection and contact flows, responsive styling, brand application, accessibility, and UI polish. Use for Selotemna public pages, its purple-white-black design system, property discovery, inspection conversion, or brand work. Do not use for admin dashboards, internal tools, backend-only work, or unrelated brands.
+description: "Design, build, review, or refine Selotemna’s multipage public Laravel and Blade website across Real Estate Development and Engineering & Construction, including the concise homepage, projects, Omu Creek, inspection and contact flows, accessibility, responsive styling, and brand application. Do not use for admin dashboards, internal tools, backend-only work, or unrelated brands."
 ---
 
 # Design Selotemna Web
 
-Use this skill as the governing design and content source for Selotemna’s public website.
+Use this skill as the governing workflow for Selotemna’s public website.
 
-## Required reading
+## Read first
 
-Before changing a homepage:
+For homepage, public-page, or architecture work, read:
 
-1. Read references/project-context.md.
-2. Read references/design-system.md.
-3. Read references/homepage-content.md.
-4. Read references/homepage-section-specification.md.
-5. Read references/real-estate-ux.md.
-6. Read references/content-rules.md.
-7. Read docs/selotemna-laravel-homepage-agent-handoff.md when it exists.
+1. references/project-context.md
+2. references/design-system.md
+3. references/homepage-content.md
+4. references/homepage-section-specification.md
+5. references/real-estate-ux.md
+6. references/content-rules.md
+7. docs/selotemna-laravel-homepage-agent-handoff.md when present
 
-Read every selected reference completely. Inspect the repository and current implementation before proposing changes.
+Read each selected reference completely. Keep detailed business facts and page specifications in the references rather than duplicating them here.
 
-## Current public direction
+For FAQ work, also read references/faq-content.md completely.
 
-- Selotemna is a corporate real-estate company.
-- Public services are Property Development, Land Sales, House Sales, Property Management, and Construction.
-- Omu Creek is the verified featured land opportunity on the homepage.
-- Book or request an inspection is the primary conversion.
-- Inspection submission remains a request until a representative confirms it.
-- Never invent listings, locations, images, contacts, statistics, testimonials, amenities, fees, payment plans, or investment claims.
+## Workflow
 
-## Design read
+1. Inspect routes, controllers, Blade views, CSS, JavaScript, tests, assets, and existing user changes.
+2. State the page type, audience, primary goal, dominant visual idea, and main responsive risk.
+3. Confirm the requested scope and preserve Laravel Blade, Tailwind CSS, and minimal framework-free JavaScript unless the repository has materially changed.
+4. Reuse existing components, tokens, and supplied assets.
+5. Implement only verified content and conditionally render missing contact or media channels.
+6. Verify accessibility, responsive behavior, content truth, formatting, tests, and the production build in proportion to the change.
 
-Before implementation, state briefly:
+## Guardrails
 
-- page type;
-- primary audience;
-- primary user goal;
-- dominant visual idea;
-- largest responsive or interaction risk.
+- Treat inspection submissions as requests, never automatic appointment confirmations.
+- Keep demo project content development-only, disabled by default in production, and clearly separate from verified Selotemna work.
+- Do not infer project status, property facts, locations, contacts, proof, statistics, testimonials, payment terms, or investment outcomes.
+- Keep the visual system purple, white, black, and neutral; use Sora and Manrope.
+- Maintain one H1, semantic landmarks, visible focus, 44px targets, reduced-motion support, and no horizontal overflow from 320px.
+- Do not introduce a client-side application framework without a material repository or product requirement.
+- Keep the implemented named-route architecture and shared Blade components aligned across all public pages.
 
-## Implementation rules
-
-- Inspect routes, controllers, Blade views, CSS, JavaScript, tests, assets, and user changes first.
-- Preserve Laravel Blade, Tailwind CSS, and minimal framework-free JavaScript unless the repository materially changes.
-- Reuse existing components and tokens.
-- Use the supplied logo without redrawing, recolouring, stretching, or reconstructing it.
-- Use Sora for headings and Manrope for body/interface text.
-- Keep the visual system purple, white, black, and neutral.
-- Do not use gradients, green accents, autoplay, fake proof, search bars, carousels, or card treatment on every section.
-- Render verified contact actions only; never use dummy values or empty links.
-- Do not build inspection persistence unless explicitly in scope.
-- Keep one H1, logical landmarks, visible focus, 44px targets, keyboard interactions, reduced-motion support, and no overflow from 320px.
-
-## Media policy
-
-- Use approved local media only.
-- Omu Creek video and poster URLs come from configuration.
-- Without a video URL, render a quiet decorative branded panel with no visitor-facing production note.
-- With a video URL, use semantic controls, playsinline, and preload metadata; never autoplay or loop.
-- Obtain captions or a transcript before publishing spoken video.
-
-## Verification
-
-For implementation work:
-
-1. Run composer test.
-2. Run npm run build.
-3. Run vendor/bin/pint --test; if it reports fixable formatting, run Pint and rerun.
-4. Inspect mobile, tablet, and desktop in a real browser.
-5. Check drawer focus/escape/backdrop, FAQ interaction, fixed mobile actions, video states, conditional contacts, keyboard access, and overflow.
-6. Scan public code for dummy links, unapproved claims, production notes, and retired positioning.
-
-Report files changed, checks completed, and unresolved production content.
+Report files changed, checks completed, unresolved contradictions, and content decisions still awaiting confirmation.

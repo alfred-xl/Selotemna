@@ -5,8 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#28166B">
 
-        <title>{{ $title ?? 'Selotemna | Property Development, Sales and Management' }}</title>
-        <meta name="description" content="{{ $description ?? 'Explore Selotemna property development, land and house sales, property management and construction services, including Omu Creek land allocations.' }}">
+        <title>{{ $title ?? 'Selotemna | Real Estate Development, Engineering & Construction' }}</title>
+        <meta name="description" content="{{ $description ?? 'Explore Selotemna’s real estate development, engineering and construction projects, including the verified Omu Creek land opportunity.' }}">
+        @unless (app()->environment('production'))
+            <meta name="robots" content="noindex, nofollow">
+        @endunless
 
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])

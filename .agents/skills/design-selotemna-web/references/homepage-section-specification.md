@@ -1,131 +1,120 @@
 # Selotemna Homepage Section Specification
 
+## Status
+
+This document describes the implemented concise multipage homepage direction.
+
 ## Goals
 
-A first-time visitor should understand that Selotemna is a real-estate company, see its five public services, review the verified Omu Creek opportunity, and know that requesting an inspection is the primary next step.
+A first-time visitor should understand that Selotemna operates through Real Estate Development and Engineering & Construction, see a concise selection of verified opportunities or projects, and know the appropriate next step.
 
-The page must feel corporate and credible rather than like a crowded marketplace or generic luxury template.
+The homepage should act as a clear overview and route visitors to dedicated public pages. It should not contain every detail about the company, divisions, projects, inspections, FAQs, or contact process.
 
-## Required order
+## Implemented concise structure
 
-1. Header
-2. Corporate hero
-3. Five services
-4. Omu Creek
-5. About
-6. Diaspora
-7. Inspection process
-8. Construction and property management
-9. Why Selotemna
-10. FAQ
-11. Final CTA
-12. Footer
+The homepage uses this sequence:
 
-The mobile contact bar is a responsive shared control.
+1. Header and navigation
+2. Concise corporate hero
+3. Two division pathways
+4. Projects preview
+5. Verified Omu Creek summary
+6. Short About summary
+7. Four-question FAQ preview
+8. Final inspection/contact conversion
+9. Footer
+
+Audience-specific content, including diaspora guidance, should be concise on the homepage and move to an appropriate dedicated page when its placement is confirmed.
 
 ## Header
 
-Desktop shows the logo, Home, About Us, Properties, Services, Contact, verified telephone action when available, and Book an Inspection.
-
-Mobile shows the logo and accessible menu trigger. The drawer contains the same navigation and only verified contact channels. Close on selection, Escape, and backdrop click; return focus and restore page scrolling.
+Navigation includes Home, About, an accessible Divisions menu, Projects, FAQ, Contact, and Book an Inspection. The Divisions menu contains Real Estate Development and Engineering & Construction. Smaller screens use the accessible drawer.
 
 ## Hero
 
-Use one H1: Property solutions built around your next move.
+The hero identifies Selotemna and introduces the relationship between its two divisions without five-equal-service messaging.
 
-Use the approved supporting sentence from the content reference. Book an Inspection is primary and Explore Properties targets Omu Creek. Do not add search, statistics, badges, a carousel, or invented imagery.
+Use one H1, a short supporting statement, and two primary actions: Book an Inspection and Explore Projects.
 
-## Services
+## Division pathways
 
-Show exactly five pathways: Property Development, Land Sales, House Sales, Property Management, and Construction.
+Show two primary pathways only:
 
-Desktop uses an editorial heading column and divided pathway grid. Mobile uses full-width rows with visible descriptions. Avoid identical floating cards.
+### Real Estate Development
+
+Summarise land, property, and development opportunities. Route detailed content to the Real Estate Development page.
+
+### Engineering & Construction
+
+Summarise engineering and construction capability. Route detailed content to the Engineering & Construction page.
+
+Property Management must not appear as an equal division. If retained, treat it as a supporting service and do not finalise its homepage placement until confirmed.
 
 ## Omu Creek
 
-Section ID: omu-creek.
+Present Omu Creek as a verified featured land opportunity under Real Estate Development.
 
-Desktop uses a 16:9 video surface on the left and property information on the right. Mobile places video first, then information, separated prices, disclaimer, and a full-width inspection action.
+Preserve exactly:
 
-Render the configured name, type, title, per-sqm price, three allocation options, disclaimer, video URL, and poster. Prices must use consistent naira formatting and tabular figures.
+- Land allocation
+- Lagos State Government Allocation
+- ₦50,000 per sqm
+- 300 sqm: ₦15,000,000
+- 500 sqm: ₦25,000,000
+- 1,000 sqm: ₦50,000,000
+- Prices exclude applicable taxes.
+- Availability and property information are subject to confirmation.
 
-CTA label: Request an Omu Creek Inspection.
+Do not assign Omu Creek an ongoing, completed, or upcoming status until confirmed.
 
-CTA event: omu_creek_inspection_click.
+Continue to reserve media space safely, format prices consistently, identify the inspection interest, and treat the CTA as a request rather than confirmation.
 
-Video event: omu_creek_video_play.
+## Projects overview
 
-Preserve the property identity in a stable data attribute for a future form.
+Projects are a core website destination. The homepage should show only a concise preview and route visitors to the Projects page.
 
-When the video URL is absent, render a quiet aria-hidden brand surface. Do not expose a production note. When present, use a semantic video with controls, playsinline, preload metadata, optional poster, useful fallback text, no autoplay, and no loop.
+The Projects page supports three categories:
 
-Do not infer location, amenities, infrastructure, landmarks, plot count, fees, payment plans, returns, appreciation, or completion dates.
+- Ongoing Projects
+- Completed Projects
+- Upcoming Projects
 
-## About
+Category labels are factual statuses, not decorative filters. Show a status only when verified.
 
-Use a split editorial composition. Keep corporate claims general and omit unverified history or statistics. Missing photography uses a silent decorative brand surface.
+Temporary project records are permitted for development and layout testing only. They are automatically removed in production, clearly identified in development, excluded from SEO and structured data, and never presented as verified Selotemna work.
 
-## Diaspora
+## About summary
 
-Use a deep-purple split section. Invite a conversation without promising unverified remote services. Contact actions are conditional.
+Use a brief corporate introduction and link to About. Do not publish unverified company history, statistics, locations, awards, or differentiators.
 
-## Inspection process
+## Inspection summary
 
-Show three readable steps explaining that the visitor chooses an opportunity, shares details, and receives the next step. Do not imply automatic confirmation. The database and form workflow are outside the current homepage scope.
+Explain that the visitor selects an opportunity or project, shares details, and receives follow-up. Submission does not automatically confirm an appointment.
 
-## Construction and property management
+The Book Inspection page contains the request explanation, conditional form, validation, consent, and request-received state.
 
-Use two related editorial panels with silent decorative media where approved imagery is unavailable. Do not claim detailed service scope before confirmation.
+## FAQ preview
 
-## Why Selotemna
+Use the approved four-question homepage preview in references/faq-content.md. Keep the complete 15-question set on the dedicated FAQ page.
 
-Use four structural benefits with dividers. Do not add statistics, awards, customer counts, or unsupported proof.
-
-## FAQ
-
-Use a two-column layout on desktop and stacked layout on mobile. Triggers are buttons with aria-expanded and controlled panels. Include the approved Omu Creek inspection answer and safe due-diligence, payment, diaspora, construction, and management guidance.
+Link to the implemented FAQ route and avoid reproducing the complete FAQ library on the homepage.
 
 ## Final CTA and footer
 
-Use a purple final CTA with inspection primary. Render WhatsApp and telephone only when verified.
+Use a concise final CTA with Book Inspection primary. Render direct contact channels only when verified. Footer navigation reflects implemented public pages without inventing legal or social links.
 
-Footer uses black, the supplied logo on a white plate, useful navigation, RC 7361086, and only verified contact fields. Never render empty labels, dummy links, or missing social icons.
-
-## Mobile contact bar
-
-Show Book Inspection plus verified WhatsApp/call icons. Use safe-area padding. Hide when the footer is substantially visible and while overlays are active.
-
-## Accessibility
+## Accessibility and responsive requirements
 
 - One H1 and logical headings
 - Semantic landmarks
 - 44px minimum targets
-- Visible focus
-- Sufficient contrast
-- Keyboard drawer and FAQ
-- Decorative media aria-hidden
+- Visible focus and sufficient contrast
+- Keyboard-accessible navigation and disclosures
+- Decorative media hidden from assistive technology
 - Reduced-motion support
 - No autoplay
 - No horizontal overflow from 320px
 
-## Analytics-ready hooks
+## Implementation status
 
-- book_inspection_click
-- omu_creek_inspection_click
-- omu_creek_video_play
-- whatsapp_click
-- call_agent_click
-- service_path_click
-
-Do not install analytics until the platform and privacy requirements are confirmed.
-
-## Definition of done
-
-- The purple, white, black, and neutral system is consistent.
-- Sora and Manrope are used.
-- Omu Creek facts match the structured config.
-- No invented content or visitor-facing production language appears.
-- Missing contacts and video render safely.
-- Drawer, FAQ, fixed actions, and footer observer work.
-- Mobile, tablet, and desktop are inspected.
-- Tests, formatting, and the production build pass.
+The homepage, navigation, shared components, tests, metadata, and project data handling are implemented together. Keep this specification aligned with the public interface when it changes.

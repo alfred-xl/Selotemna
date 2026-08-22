@@ -1,144 +1,192 @@
-# Selotemna Laravel Homepage — Current Handoff
+# Selotemna Laravel Website — Project Direction Handoff
 
-Status: Homepage frontend implemented; inspection persistence intentionally deferred.
+Status: Multipage public frontend implemented and aligned to the two-division business direction.
 
 Governing skill: design-selotemna-web
 
-## Repository audit
+## Implemented phase
 
-- Laravel Framework 13.25.0
-- PHP 8.4.22
+This handoff records the implemented public architecture. The Laravel homepage is a concise overview of the approved two-division hierarchy.
+
+Blade, CSS, JavaScript, routes, controllers, configuration, mail handling, and feature tests are aligned in this phase.
+
+## Repository baseline
+
+- Laravel Framework 13
 - Blade rendering
-- Tailwind CSS 4.3.3
-- Vite 8.2.1
-- laravel-vite-plugin 3.2.0
-- Sora and Manrope loaded through the Laravel Vite font helper
+- Tailwind CSS 4
+- Vite
+- Sora and Manrope
 - Minimal framework-free JavaScript
-- No client-side application framework or component library
-- No property catalogue or inspection-request model
-- Pest 5 test suite
-- Every repository file currently appears untracked, so Git has no baseline for separating earlier changes
+- No complete project catalogue
+- No persisted inspection-request workflow
 
-## Design read
+## Approved business positioning
 
-This is a corporate, inspection-led real-estate homepage for buyers, families, investors, diaspora customers, and businesses.
+Selotemna has two primary public divisions:
 
-The visual direction is a white-led editorial composition with disciplined black typography, restrained Selotemna purple, and Omu Creek as the single verified property opportunity.
+1. Real Estate Development
+2. Engineering & Construction
 
-The primary goal is to understand the five services and request an inspection. The largest responsive risk is keeping the Omu Creek media/pricing block, mobile drawer, and fixed mobile actions readable without overflow or obstruction.
+Land and property opportunities are presented under Real Estate Development.
 
-## Public services
+Property Management is not a primary homepage division. It may remain a possible supporting service until its scope and future placement are confirmed.
 
-Use exactly:
+Do not return to the earlier model of several equal homepage service divisions.
 
-1. Property Development
-2. Land Sales
-3. House Sales
-4. Property Management
-5. Construction
+## Implemented public architecture
 
-## Homepage order
+The site now provides:
 
-1. Header
-2. Corporate hero
-3. Five services
-4. Omu Creek
-5. About
-6. Diaspora
-7. Inspection process
-8. Construction and property management
-9. Why Selotemna
-10. FAQ
-11. Final CTA
-12. Footer
+- `/about` — About
+- `/real-estate-development` — Real Estate Development
+- `/real-estate-development/omu-creek` — verified Omu Creek detail
+- `/engineering-construction` — Engineering & Construction
+- `/projects` — Projects
+- `/book-inspection` — request-oriented Book Inspection
+- `/faq` — complete approved FAQ
+- `/contact` — configured contact channels and enquiry pathways
 
-The mobile contact bar is rendered as a shared responsive component.
+The homepage is a concise overview that introduces the company and its two divisions, previews Omu Creek and project categories, and routes visitors to dedicated pages.
 
-## Omu Creek data contract
+A generic Project Detail route is not implemented because verified project records and slugs have not been supplied.
 
-The controller receives one structured config array containing:
+## Projects architecture
 
-- name;
-- type;
-- title;
-- price per sqm;
-- allocation options;
-- disclaimer;
-- video URL;
-- video poster.
+Projects are now an important website content type.
 
-Verified values:
+The Projects page supports:
 
-- Omu Creek
+- Ongoing Projects
+- Completed Projects
+- Upcoming Projects
+
+These labels are factual statuses. Do not assign a status until it is confirmed.
+
+A future generic Project Detail page should present only approved project information, media, scope, location, status, and actions appropriate to that project.
+
+## Temporary project data
+
+Temporary project records are allowed only for development and layout testing.
+
+They must:
+
+- be removed automatically in production using the application environment;
+- be visibly identified as layout samples in development;
+- remain separate from verified Selotemna records;
+- be excluded from SEO, structured data, sitemaps, analytics, statistics, case studies, and public proof;
+- never be presented as completed or active Selotemna work.
+
+Production-safe empty states work without temporary records.
+
+## Omu Creek
+
+Omu Creek remains the verified featured land opportunity under Real Estate Development.
+
+Preserve these facts exactly:
+
 - Land allocation
-- Certificate of Occupancy (C of O)
+- Lagos State Government Allocation
 - ₦50,000 per sqm
-- 300 sqm at ₦15,000,000
-- 500 sqm at ₦25,000,000
-- 1,000 sqm at ₦50,000,000
+- 300 sqm: ₦15,000,000
+- 500 sqm: ₦25,000,000
+- 1,000 sqm: ₦50,000,000
 - Prices exclude applicable taxes.
 - Availability and property information are subject to confirmation.
 
-Do not add a location, unverified fees, payment plans, plot count, amenities, infrastructure, landmarks, returns, appreciation, or completion dates.
+Do not assign Omu Creek an ongoing, completed, or upcoming status until confirmed.
 
-## Environment configuration
+The approved FAQ source now supplies location, title claims, payment terms, charges, documentation stages, planned infrastructure, allocation timing, construction guidance, default terms, resale terms, and refund terms. The canonical wording is in the embedded skill’s references/faq-content.md file.
 
-Keep values empty until verified:
+## Inspection behavior
 
-    SELOTEMNA_PHONE=
-    SELOTEMNA_WHATSAPP=
-    SELOTEMNA_EMAIL=
-    SELOTEMNA_ADDRESS=
-    SELOTEMNA_BUSINESS_HOURS=
-    SELOTEMNA_OMU_CREEK_VIDEO_URL=
-    SELOTEMNA_OMU_CREEK_VIDEO_POSTER=
+Inspection submissions are requests. They do not automatically confirm appointments.
 
-Telephone, WhatsApp, and email actions render only from safe verified values.
+When a valid `SELOTEMNA_EMAIL` and a deliverable Laravel mailer are configured, the Book Inspection page collects and validates the visitor’s details, preferred date, opportunity of interest, and consent, then sends a rate-limited Laravel Mail message. The `log` and `array` mailers do not activate the public form. Without a safe delivery path, it hides the form and renders verified direct-contact options. It does not persist requests to a database.
 
-## Video behaviour
+## FAQ boundary
 
-When SELOTEMNA_OMU_CREEK_VIDEO_URL is empty, the page renders a quiet decorative 16:9 Selotemna panel.
+The homepage uses the approved four-question preview. The dedicated FAQ page contains all 15 approved Omu Creek questions with the Registered Survey fee corrected to ₦1,500,000.
 
-When set, it renders a semantic video with controls, playsinline, preload metadata, an optional configured poster, useful fallback text, and the omu_creek_video_play event hook. It must not autoplay or loop.
+## Implemented homepage direction
 
-If the supplied video contains speech, captions or a transcript remain required for production.
+The homepage uses:
 
-## Inspection boundary
+1. Concise corporate hero
+2. Two division pathways
+3. Concise Projects overview
+4. Verified Omu Creek feature under Real Estate Development
+5. Short About summary
+6. Four-question FAQ preview
+7. Final inspection/contact conversion
+8. Footer
 
-The homepage explains the three-step process and exposes a stable property-interest attribute on the Omu Creek CTA. It does not create a database record, route, form, model, migration, or automatic appointment.
+Detailed division, opportunity, project, inspection, FAQ, and contact content lives on dedicated pages.
 
-A future implementation must treat submission as a request and must not claim appointment confirmation.
+## Implemented work
 
-## Shared frontend
+The approved phase completed the following work.
 
-- resources/views/layouts/site.blade.php owns the page shell and metadata.
-- Header implements desktop navigation and an accessible mobile drawer.
-- Footer and mobile bar render contact actions conditionally.
-- resources/js/app.js implements drawer focus/escape/backdrop behaviour, FAQ disclosure, and footer-aware mobile bar hiding.
-- resources/css/app.css contains the Tailwind v4 tokens and shared layout utilities.
+### Stage 1 — Content and navigation alignment
 
-## Logo
+- replaced the legacy equal-service language with the two divisions;
+- added route-aware navigation and unique metadata;
+- kept Omu Creek under Real Estate Development;
+- preserved conditional verified contact actions.
 
-The active asset is public/assets/logo.png, 189 × 153 with transparency. It is suitable for the current frontend but remains low resolution. Request a production SVG or higher-resolution transparent PNG before launch. Do not redraw or alter the wordmark.
+### Stage 2 — Projects foundation
 
-## Required verification
+- retained environment-filtered temporary project arrays for layout work;
+- added a reusable accessible tab component;
+- created the Projects route and view without a fictional detail route;
+- added safe empty states and tests.
 
-Run:
+### Stage 3 — Dedicated division pages
 
-    composer test
-    npm run build
-    vendor/bin/pint --test
+- built Real Estate Development;
+- built Engineering & Construction;
+- left Property Management unpublished pending scope and placement.
 
-Also inspect 320px, 390px, tablet, and desktop widths in a real browser. Check the drawer, FAQ, Omu Creek prices, video states, conditional contacts, fixed mobile bar, keyboard focus, and horizontal overflow.
+### Stage 4 — Inspection, FAQ, About, and Contact
 
-## Outstanding production content
+- implemented the conditional request-based inspection workflow;
+- built the dedicated FAQ page from the approved 15-item source;
+- added About and Contact pages using only approved or configured content.
 
-1. Full Omu Creek location
-2. Actual Omu Creek video and poster
-3. Captions or transcript if the video contains speech
-4. Production-quality logo
-5. Verified telephone, WhatsApp, email, address, and business hours
-6. Any applicable charges beyond the stated tax qualifier
-7. Complete inspection request workflow
-8. Approved project and corporate photography
-9. Operating locations and legal-page content
+### Stage 5 — Homepage consolidation
+
+- reduced homepage detail;
+- kept concise summaries and selected previews;
+- routed deeper exploration to dedicated pages.
+
+## Existing shared frontend
+
+The current repository contains:
+
+- a shared Blade layout;
+- reusable header, footer, button, division, project tabs/cards, FAQ, contact, CTA, and mobile-contact components;
+- Tailwind brand tokens;
+- Sora and Manrope;
+- accessible desktop dropdown, mobile drawer, project tabs, and FAQ JavaScript;
+- conditional contact actions;
+- a complete Omu Creek detail page and concise homepage summary.
+
+Keep these foundations and the content hierarchy aligned in future changes.
+
+## Assets
+
+The active logo is public/assets/logo.png, a 189 × 153 transparent raster asset. Request a production SVG or higher-resolution transparent PNG before launch. Do not redraw or alter the wordmark.
+
+Approved project photography and Omu Creek video/poster assets remain outstanding.
+
+## Decisions still required
+
+1. Project status definitions and approval owner
+2. Verified records for each project category
+3. Omu Creek project status
+4. Generic Project Detail field requirements
+5. Real Estate Development inventory model beyond Omu Creek
+6. Detailed Engineering & Construction scope and enquiry fields
+7. Property Management scope and placement
+8. Verified contact details and operating locations
+9. Approved project photography and Omu Creek video/poster assets
