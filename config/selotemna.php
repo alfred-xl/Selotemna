@@ -53,9 +53,9 @@ return [
             'A discontinued transaction before full payment may qualify for a refund, subject to a 30% administrative and agency deduction. Refunds are typically processed within 60 days of the request.',
         ],
         'disclaimer' => 'Prices exclude applicable taxes. Availability and property information are subject to confirmation.',
-        'video_url' => env('SELOTEMNA_OMU_CREEK_VIDEO_URL') ?: 'https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/OMU%20CREEK%202%20VIDEO%201.mp4',
+        'video_url' => env('SELOTEMNA_OMU_CREEK_VIDEO_URL') ?: 'https://selotemna.boatengalfred.work/OMU%20CREEK%202%20VIDEO%201.mp4',
         'video_poster' => env('SELOTEMNA_OMU_CREEK_VIDEO_POSTER'),
-        'short_video_url' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL') ?: 'https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/SHORT%20FORM%201.mp4',
+        'short_video_url' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL') ?: 'https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4',
         'short_video_poster' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_POSTER'),
     ],
 
