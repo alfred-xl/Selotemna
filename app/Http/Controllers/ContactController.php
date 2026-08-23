@@ -11,10 +11,13 @@ class ContactController extends Controller
 
     public function __invoke(): View
     {
+        $editorialMedia = $this->content->editorialMedia();
+
         return view('contact', [
-            'title' => 'Contact Selotemna',
-            'description' => 'Contact Selotemna about real estate development, Omu Creek inspections, engineering or construction requirements.',
+            'title' => 'Contact Selotemna | Property and Project Enquiries',
+            'description' => 'Contact Selotemna about Omu Creek, Real Estate Development, Engineering & Construction or an inspection request.',
             'contact' => $this->content->contactDetails(),
+            'contactMedia' => $editorialMedia['contact'] ?? null,
         ]);
     }
 }

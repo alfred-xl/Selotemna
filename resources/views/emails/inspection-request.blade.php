@@ -1,24 +1,28 @@
-<h1>New inspection request</h1>
+<h1>New inspection request {{ $inspection->reference }}</h1>
 
 <dl>
+    <dt>Request reference</dt>
+    <dd>{{ $inspection->reference }}</dd>
+    <dt>Status</dt>
+    <dd>{{ ucfirst($inspection->status) }}</dd>
     <dt>Full name</dt>
-    <dd>{{ $details['full_name'] }}</dd>
+    <dd>{{ $inspection->full_name }}</dd>
     <dt>Telephone number</dt>
-    <dd>{{ $details['phone'] }}</dd>
+    <dd>{{ $inspection->phone }}</dd>
     <dt>Email</dt>
-    <dd>{{ $details['email'] ?? 'Not supplied' }}</dd>
+    <dd>{{ $inspection->email ?: 'Not supplied' }}</dd>
     <dt>WhatsApp number</dt>
-    <dd>{{ $details['whatsapp'] ?? 'Not supplied' }}</dd>
+    <dd>{{ $inspection->whatsapp ?: 'Not supplied' }}</dd>
     <dt>Property or opportunity</dt>
-    <dd>{{ $details['interest'] }}</dd>
+    <dd>{{ $inspection->project_name }}</dd>
     <dt>Preferred date</dt>
-    <dd>{{ $details['preferred_date'] }}</dd>
+    <dd>{{ $inspection->preferred_date->format('j F Y') }}</dd>
     <dt>Preferred time period</dt>
-    <dd>{{ $details['preferred_time'] ?? 'Not supplied' }}</dd>
+    <dd>{{ $inspection->preferred_time ?: 'No preference' }}</dd>
     <dt>Preferred contact method</dt>
-    <dd>{{ $details['contact_method'] ?? 'Not supplied' }}</dd>
+    <dd>{{ $inspection->preferred_contact_method }}</dd>
     <dt>Message</dt>
-    <dd>{{ $details['message'] ?? 'Not supplied' }}</dd>
+    <dd>{{ $inspection->message ?: 'Not supplied' }}</dd>
 </dl>
 
-<p>This submission is an inspection request. It does not confirm an appointment.</p>
+<p>This request is saved in the Selotemna website database. It does not confirm an appointment.</p>

@@ -3,6 +3,7 @@
 <article
     {{ $attributes->class('border-t border-ink-200 py-8 md:py-10 lg:px-8 lg:first:pl-0 lg:last:pr-0') }}
     data-primary-division
+    data-reveal
 >
     <div class="flex items-start gap-5">
         <span class="flex size-12 shrink-0 items-center justify-center rounded-xl border border-brand-100 bg-brand-50 text-brand-700" aria-hidden="true">
@@ -29,7 +30,7 @@
             <p class="mt-4 max-w-xl leading-7 text-ink-500">{{ $description }}</p>
             <a href="{{ $href }}" class="group text-link mt-5" data-division-action>
                 {{ $linkLabel }}
-                <svg aria-hidden="true" class="size-4 shrink-0 transition-transform group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M5 12h14" />
                     <path d="m13 6 6 6-6 6" />
                 </svg>

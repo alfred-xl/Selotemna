@@ -12,8 +12,8 @@ class AboutController extends Controller
     public function __invoke(): View
     {
         return view('about', [
-            'title' => 'About Selotemna | Real Estate and Project Delivery',
-            'description' => 'Learn about Selotemna and its two divisions: Real Estate Development and Engineering & Construction.',
+            'title' => 'About Selotemna | Real Estate Development and Construction',
+            'description' => 'Meet Selotemna and explore its two divisions: Real Estate Development and Engineering & Construction.',
             'contact' => $this->content->contactDetails(),
         ]);
     }

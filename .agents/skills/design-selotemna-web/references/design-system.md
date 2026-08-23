@@ -85,6 +85,10 @@ When approved photography is unavailable:
 
 Keep visible labels, helpful errors, and clear focus states. FAQ triggers must be real buttons with aria-expanded and controlled panels. Do not animate essential layout continuously.
 
+## Motion
+
+Use the restrained, progressive-enhancement patterns and tokens defined in references/motion-system.md. Motion must preserve immediate access to content and fully respect reduced-motion preferences.
+
 ## Fixed mobile actions
 
 The mobile contact bar may contain inspection and verified contact channels. It must use safe-area padding, stay below overlays, and hide when the footer is visible.

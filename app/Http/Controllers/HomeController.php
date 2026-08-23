@@ -13,9 +13,10 @@ class HomeController extends Controller
     {
         return view('home', [
             'title' => 'Selotemna | Real Estate Development, Engineering & Construction',
-            'description' => 'Explore Selotemna’s real estate development, engineering and construction direction, projects and the Omu Creek land opportunity.',
+            'description' => 'Explore Selotemna’s two divisions and its sole published Upcoming Project, the Omu Creek land opportunity.',
             'featuredProperty' => $this->content->featuredProperty(),
-            'projectGroups' => $this->content->projectGroups(),
+            'media' => $this->content->siteMedia(),
+            'testimonials' => $this->content->testimonials(),
             'faqs' => $this->content->homepageFaqs(),
             'contact' => $this->content->contactDetails(),
         ]);

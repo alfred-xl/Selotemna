@@ -23,6 +23,8 @@ Read each selected reference completely. Keep detailed business facts and page s
 
 For FAQ work, also read references/faq-content.md completely.
 
+For animation, scrolling behaviour, transitions, or interactive motion work, also read references/motion-system.md completely.
+
 ## Workflow
 
 1. Inspect routes, controllers, Blade views, CSS, JavaScript, tests, assets, and existing user changes.

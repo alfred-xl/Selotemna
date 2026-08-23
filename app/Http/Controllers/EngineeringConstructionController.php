@@ -13,8 +13,9 @@ class EngineeringConstructionController extends Controller
     {
         return view('engineering-construction', [
             'title' => 'Engineering & Construction | Selotemna',
-            'description' => 'Discuss residential, commercial and real-estate development requirements with Selotemna’s Engineering & Construction division.',
-            'projectGroups' => $this->content->projectGroups('Engineering & Construction'),
+            'description' => 'Bring an engineering or construction requirement to Selotemna for a focused project conversation and clear next step.',
+            'media' => $this->content->siteMedia(),
+            'testimonials' => $this->content->testimonials('Engineering & Construction'),
             'contact' => $this->content->contactDetails(),
         ]);
     }

@@ -14,8 +14,9 @@
 
 <a
     href="{{ $href }}"
+    data-motion-button
     {{ $attributes->class([
-        'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition duration-200 active:scale-[0.98]',
+        'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold',
         $variants[$variant] ?? $variants['primary'],
     ]) }}
 >

@@ -36,9 +36,9 @@ The Projects experience supports:
 - Completed Projects
 - Upcoming Projects
 
-Use a project status only when verified.
+Use a project status only when verified. Omu Creek is currently the sole published project and is classified as an Upcoming Project. Ongoing and Completed categories remain hidden until verified records exist.
 
-Temporary project data may be used for development and layout testing only. It is marked as layout content in development, automatically removed in production, excluded from public metadata and proof, and never presented as verified Selotemna work.
+The project catalogue contains no demo or layout-sample records.
 
 ## Verified Omu Creek opportunity
 
@@ -55,11 +55,13 @@ Preserve these facts exactly:
 - Prices exclude applicable taxes.
 - Availability and property information are subject to confirmation.
 
-Omu Creek does not have a confirmed ongoing, completed, or upcoming status. Do not classify it until that status is supplied.
+Omu Creek is classified as an Upcoming Project. The label describes its project-development stage; current land availability remains subject to confirmation.
 
 ## Inspection behavior
 
-Inspection submissions are requests. They do not automatically confirm an appointment. When a valid `SELOTEMNA_EMAIL` and a deliverable Laravel mailer are configured, the Book Inspection page enables a validated, rate-limited Laravel Mail form. The `log` and `array` mailers do not activate the public form. Without a safe delivery path, the page shows only verified direct-contact options. No inspection database persistence is implemented.
+Inspection submissions are requests. They do not automatically confirm an appointment. The Book Inspection page validates and stores each request in the `inspection_requests` table before attempting any optional staff email notification. Every saved request receives a human-readable reference and starts with the internal `new` status. A repeated submission token returns the existing request instead of creating a duplicate.
+
+When a valid `SELOTEMNA_EMAIL` and deliverable Laravel mailer are configured, Selotemna also receives an email containing the saved request reference. Email delivery failure is recorded without discarding the database record. The form therefore remains available when email is unconfigured or uses the `log` or `array` mailer.
 
 ## Technology
 
@@ -96,22 +98,36 @@ Verified contact actions are hidden until values are provided:
     SELOTEMNA_ADDRESS=
     SELOTEMNA_BUSINESS_HOURS=
 
-Omu Creek media is optional:
+Omu Creek media is configured through:
 
-    SELOTEMNA_OMU_CREEK_VIDEO_URL=
+    SELOTEMNA_OMU_CREEK_VIDEO_URL="https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/OMU%20CREEK%202%20VIDEO%201.mp4"
     SELOTEMNA_OMU_CREEK_VIDEO_POSTER=
+    SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL="https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/SHORT%20FORM%201.mp4"
+    SELOTEMNA_OMU_CREEK_SHORT_VIDEO_POSTER=
 
 Without a video URL, Omu Creek uses a decorative branded panel. If a published video contains speech, provide captions or a transcript.
+
+Approved editorial images should be saved in `public/assets/images` using these filenames:
+
+- `selotemna-development-aerial.jpg`
+- `selotemna-earthworks-truck.jpg`
+- `selotemna-building-construction.jpg`
+
+Missing image files fall back to branded media surfaces. Testimonials render only from approved records with confirmed publication permission.
+
+The Book Inspection and Contact page heroes use `selotemna-inspection-consultation.jpg` and `selotemna-contact-meeting.jpg`, downloaded from the credited Pexels source pages recorded in `config/selotemna.php`. They are stock images, not representations of Selotemna staff or completed work. Public captions link to their source pages.
 
 ## Architecture
 
 - app/Http/Controllers contains dedicated public-page and inspection controllers.
+- app/Models/InspectionRequest.php represents persisted inspection requests and generates public references.
+- database/migrations contains the inspection-request table alongside the Laravel foundation tables.
 - app/Support/SelotemnaContent.php normalises shared opportunity, project, FAQ, and safe contact data.
-- config/selotemna.php contains Omu Creek, FAQ, temporary project, and contact configuration.
+- config/selotemna.php contains Omu Creek, verified projects, approved testimonial, media, FAQ, and contact configuration.
 - resources/views contains the shared Blade layout, components, public pages, and inspection email.
 - resources/css/app.css contains Tailwind brand tokens and shared styles.
-- resources/js/app.js handles the desktop dropdown, mobile drawer, project tabs, FAQ, and mobile-contact behavior.
-- tests/Feature/PublicWebsiteTest.php covers the multipage public frontend and inspection delivery behavior.
+- resources/js/app.js handles the desktop dropdown, mobile drawer, project tabs, FAQ, form-error focus, and submit-once behavior.
+- tests/Feature/PublicWebsiteTest.php covers the multipage public frontend and persisted inspection-request behavior.
 - .agents/skills/design-selotemna-web contains the governing project guidance.
 - docs/selotemna-laravel-homepage-agent-handoff.md records the implemented architecture and outstanding inputs.
 

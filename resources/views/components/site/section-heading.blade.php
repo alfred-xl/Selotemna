@@ -6,7 +6,7 @@
     'theme' => 'light',
 ])
 
-<div {{ $attributes->class(['max-w-3xl', 'mx-auto text-center' => $align === 'center']) }}>
+<div {{ $attributes->class(['max-w-3xl', 'mx-auto text-center' => $align === 'center']) }} data-reveal>
     <span @class(['eyebrow', '!text-brand-100' => $theme === 'dark'])>{{ $eyebrow }}</span>
     <h2 @class([
         'text-[clamp(1.875rem,4vw,2.75rem)] font-semibold leading-[1.14] tracking-[-0.03em]',

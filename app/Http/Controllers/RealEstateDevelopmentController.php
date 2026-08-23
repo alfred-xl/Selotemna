@@ -13,9 +13,9 @@ class RealEstateDevelopmentController extends Controller
     {
         return view('real-estate-development', [
             'title' => 'Real Estate Development | Selotemna',
-            'description' => 'Explore Selotemna land, property and development opportunities, including the verified Omu Creek land opportunity.',
+            'description' => 'Explore Selotemna’s Real Estate Development division and the Omu Creek Upcoming Project and land opportunity.',
             'featuredProperty' => $this->content->featuredProperty(),
-            'projectGroups' => $this->content->projectGroups('Real Estate Development'),
+            'testimonials' => $this->content->testimonials('Real Estate Development'),
             'contact' => $this->content->contactDetails(),
         ]);
     }

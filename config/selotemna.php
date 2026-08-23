@@ -9,6 +9,7 @@ return [
 
     'featured_property' => [
         'name' => 'Omu Creek',
+        'status' => 'Upcoming Project',
         'type' => 'Land allocation',
         'title' => 'Lagos State Government Allocation',
         'overview' => 'Omu Creek Estate is a planned residential community intended for people looking to build homes or invest in land.',
@@ -52,8 +53,10 @@ return [
             'A discontinued transaction before full payment may qualify for a refund, subject to a 30% administrative and agency deduction. Refunds are typically processed within 60 days of the request.',
         ],
         'disclaimer' => 'Prices exclude applicable taxes. Availability and property information are subject to confirmation.',
-        'video_url' => env('SELOTEMNA_OMU_CREEK_VIDEO_URL'),
+        'video_url' => env('SELOTEMNA_OMU_CREEK_VIDEO_URL') ?: 'https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/OMU%20CREEK%202%20VIDEO%201.mp4',
         'video_poster' => env('SELOTEMNA_OMU_CREEK_VIDEO_POSTER'),
+        'short_video_url' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL') ?: 'https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/SHORT%20FORM%201.mp4',
+        'short_video_poster' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_POSTER'),
     ],
 
     'homepage_faq_ids' => [
@@ -136,40 +139,54 @@ return [
         ],
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Temporary project presentation content
-    |--------------------------------------------------------------------------
-    |
-    | These records are development-only layout samples, not verified Selotemna
-    | work. SelotemnaContent removes them whenever the application is running in
-    | production. They must not be used in metadata, schema, proof, or reporting.
-    |
-    */
-    'temporary_projects' => [
+    'media' => [
+        'development_aerial' => 'assets/images/selotemna-development-aerial.jpg',
+        'earthworks_truck' => 'assets/images/selotemna-earthworks-truck.jpg',
+        'building_construction' => 'assets/images/selotemna-building-construction.jpg',
+    ],
+
+    'editorial_media' => [
+        'inspection' => [
+            'path' => 'assets/images/selotemna-inspection-consultation.jpg',
+            'source_url' => 'https://www.pexels.com/photo/a-man-talking-to-his-clients-while-looking-at-the-property-7489096/',
+            'credit' => 'Photo by Gustavo Fring on Pexels',
+            'alt' => 'A property professional speaking with clients during a viewing.',
+        ],
+        'contact' => [
+            'path' => 'assets/images/selotemna-contact-meeting.jpg',
+            'source_url' => 'https://www.pexels.com/photo/business-meeting-in-lagos-office-setting-30688596/',
+            'credit' => 'Photo by Ninthgrid on Pexels',
+            'alt' => 'Professionals discussing a project around a meeting table.',
+        ],
+    ],
+
+    'projects' => [
         'ongoing' => [
             'label' => 'Ongoing Projects',
-            'empty_message' => 'No verified ongoing projects are currently published. Discuss a development or construction requirement with Selotemna.',
-            'items' => [
-                ['name' => 'Residential Development Layout Sample', 'status' => 'Ongoing Project', 'division' => 'Real Estate Development', 'summary' => 'Temporary content used to test the presentation of a real estate development project.', 'is_temporary' => true],
-                ['name' => 'Engineering Works Layout Sample', 'status' => 'Ongoing Project', 'division' => 'Engineering & Construction', 'summary' => 'Temporary content used to test the presentation of an engineering and construction project.', 'is_temporary' => true],
-            ],
+            'items' => [],
         ],
         'completed' => [
             'label' => 'Completed Projects',
-            'empty_message' => 'No verified completed projects are currently published. Discuss a development or construction requirement with Selotemna.',
-            'items' => [
-                ['name' => 'Completed Development Layout Sample', 'status' => 'Completed Project', 'division' => 'Real Estate Development', 'summary' => 'Temporary content used to test the presentation of a completed development record.', 'is_temporary' => true],
-                ['name' => 'Completed Construction Layout Sample', 'status' => 'Completed Project', 'division' => 'Engineering & Construction', 'summary' => 'Temporary content used to test the presentation of a completed construction record.', 'is_temporary' => true],
-            ],
+            'items' => [],
         ],
         'upcoming' => [
             'label' => 'Upcoming Projects',
-            'empty_message' => 'No verified upcoming projects are currently published. Discuss a development or construction requirement with Selotemna.',
             'items' => [
-                ['name' => 'Future Development Layout Sample', 'status' => 'Upcoming Project', 'division' => 'Real Estate Development', 'summary' => 'Temporary content used to test the presentation of a future development record.', 'is_temporary' => true],
-                ['name' => 'Future Engineering Layout Sample', 'status' => 'Upcoming Project', 'division' => 'Engineering & Construction', 'summary' => 'Temporary content used to test the presentation of a future engineering record.', 'is_temporary' => true],
+                [
+                    'slug' => 'omu-creek',
+                    'name' => 'Omu Creek',
+                    'status' => 'Upcoming Project',
+                    'division' => 'Real Estate Development',
+                    'summary' => 'A planned residential community for people looking to build homes or invest in land.',
+                    'route' => 'omu-creek',
+                ],
             ],
         ],
     ],
+
+    /*
+    | Testimonials must contain an approved quote, an approved public name, a
+    | relevant division or project, and confirmed permission before rendering.
+    */
+    'testimonials' => [],
 ];

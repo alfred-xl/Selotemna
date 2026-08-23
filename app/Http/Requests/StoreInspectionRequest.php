@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreInspectionRequest extends FormRequest
 {
@@ -15,16 +16,18 @@ class StoreInspectionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'submission_token' => ['required', 'uuid'],
             'full_name' => ['required', 'string', 'max:120'],
-            'phone' => ['required', 'string', 'max:40'],
-            'email' => ['nullable', 'email', 'max:160'],
-            'whatsapp' => ['nullable', 'string', 'max:40'],
-            'interest' => ['required', 'string', 'max:160'],
+            'phone' => ['required', 'string', 'min:7', 'max:40'],
+            'email' => ['nullable', 'required_if:contact_method,Email', 'email', 'max:160'],
+            'whatsapp' => ['nullable', 'required_if:contact_method,WhatsApp', 'string', 'min:7', 'max:40'],
+            'interest' => ['required', Rule::in(['Omu Creek'])],
             'preferred_date' => ['required', 'date', 'after_or_equal:today'],
             'preferred_time' => ['nullable', 'in:Morning,Afternoon,No preference'],
-            'contact_method' => ['nullable', 'in:Telephone,WhatsApp,Email'],
+            'contact_method' => ['required', 'in:Telephone,WhatsApp,Email'],
             'message' => ['nullable', 'string', 'max:2000'],
             'consent' => ['accepted'],
+            'website' => ['nullable', 'string', 'max:0'],
         ];
     }
 
@@ -33,6 +36,9 @@ class StoreInspectionRequest extends FormRequest
     {
         return [
             'preferred_date.after_or_equal' => 'Choose today or a future preferred date.',
+            'email.required_if' => 'Enter an email address when Email is your preferred contact method.',
+            'whatsapp.required_if' => 'Enter a WhatsApp number when WhatsApp is your preferred contact method.',
+            'interest.in' => 'The inspection request must be for the published Omu Creek opportunity.',
             'consent.accepted' => 'Please acknowledge that this is an inspection request and not a confirmed appointment.',
         ];
     }

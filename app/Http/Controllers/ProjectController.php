@@ -13,7 +13,7 @@ class ProjectController extends Controller
     {
         return view('projects.index', [
             'title' => 'Projects | Selotemna',
-            'description' => 'Explore Selotemna project categories across Real Estate Development and Engineering & Construction.',
+            'description' => 'Explore Omu Creek, Selotemna’s sole published project, classified as an Upcoming Project under Real Estate Development.',
             'projectGroups' => $this->content->projectGroups(),
             'contact' => $this->content->contactDetails(),
         ]);

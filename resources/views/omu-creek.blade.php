@@ -1,14 +1,14 @@
 @extends('layouts.site')
 
 @section('content')
-    <x-site.page-hero eyebrow="Real Estate Development · Land allocation" heading="Omu Creek" intro="A planned residential community for people looking to build homes or invest in land." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'Real Estate Development', 'href' => route('real-estate-development')], ['label' => 'Omu Creek']]" />
+    <x-site.page-hero eyebrow="Upcoming Project · Real Estate Development · Land allocation" heading="Omu Creek" intro="A planned residential community for people looking to build homes or invest in land." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'Real Estate Development', 'href' => route('real-estate-development')], ['label' => 'Omu Creek']]" />
 
     <section class="section-space bg-white">
         <div class="site-container grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-            <div class="aspect-video min-w-0 overflow-hidden rounded-[1.5rem] border border-brand-100 bg-brand-950">
+            <div class="aspect-video min-w-0 overflow-hidden rounded-[1.5rem] border border-brand-100 bg-brand-950" data-reveal="media">
                 @if ($featuredProperty['video_url'])
-                    <video class="h-full w-full bg-ink-950 object-contain" controls playsinline preload="metadata" @if ($featuredProperty['video_poster']) poster="{{ $featuredProperty['video_poster'] }}" @endif data-event="omu_creek_video_play">
-                        <source src="{{ $featuredProperty['video_url'] }}">
+                    <video class="h-full w-full bg-ink-950 object-contain" controls playsinline preload="metadata" @if ($featuredProperty['video_poster']) poster="{{ $featuredProperty['video_poster'] }}" @endif data-event="omu_creek_video_play" aria-label="Detailed Omu Creek property video">
+                        <source src="{{ $featuredProperty['video_url'] }}" type="video/mp4">
                         Your browser does not support embedded video. Contact Selotemna for Omu Creek property information.
                     </video>
                 @else
@@ -19,7 +19,7 @@
                 @endif
             </div>
             <div>
-                <x-site.section-heading eyebrow="Opportunity overview" heading="A residential land opportunity." :intro="$featuredProperty['overview']" />
+                <x-site.section-heading eyebrow="Project and opportunity overview" heading="An upcoming residential land project." :intro="$featuredProperty['overview']" />
                 <p class="mt-5 leading-7 text-ink-500">{{ $featuredProperty['marketing'] }}</p>
                 <div class="mt-8 grid gap-6 sm:grid-cols-2">
                     <div><h2 class="text-xl font-semibold">Location coverage</h2><ul class="mt-4 space-y-2 text-ink-500">@foreach ($featuredProperty['locations'] as $location)<li class="feature-line">{{ $location }}</li>@endforeach</ul></div>
@@ -33,10 +33,10 @@
         <div class="site-container">
             <div class="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
                 <x-site.section-heading eyebrow="Plot sizes and pricing" heading="Current outright options." intro="The current rate is ₦50,000 per sqm." />
-                <div class="overflow-hidden rounded-[1.25rem] border border-ink-200 bg-white">
+                <div class="overflow-hidden rounded-[1.25rem] border border-ink-200 bg-white" data-reveal-group>
                     <dl>
                         @foreach ($featuredProperty['options'] as $option)
-                            <div class="grid gap-2 border-b border-ink-200 px-6 py-5 last:border-b-0 sm:grid-cols-[1fr_auto] sm:items-center">
+                            <div class="grid gap-2 border-b border-ink-200 px-6 py-5 last:border-b-0 sm:grid-cols-[1fr_auto] sm:items-center" data-reveal>
                                 <dt><span class="block font-semibold text-ink-950">{{ $option['label'] }}</span><span class="mt-1 block text-sm text-ink-500 tabular-nums">{{ number_format($option['size_sqm']) }} sqm</span></dt>
                                 <dd class="font-display text-xl font-semibold text-brand-700 tabular-nums">₦{{ number_format($option['price']) }}</dd>
                             </div>
@@ -81,9 +81,9 @@
     <section class="section-space bg-white">
         <div class="site-container">
             <x-site.section-heading eyebrow="Allocation and construction" heading="Approved timing and next-step information." />
-            <div class="mt-10 grid gap-6 lg:grid-cols-2">
-                <div class="plain-panel"><h3>Physical allocation</h3><p>{{ $featuredProperty['allocation'] }}</p></div>
-                <div class="plain-panel"><h3>Construction after allocation</h3><p>{{ $featuredProperty['construction'] }}</p></div>
+            <div class="mt-10 grid gap-6 lg:grid-cols-2" data-reveal-group>
+                <div class="plain-panel" data-reveal><h3>Physical allocation</h3><p>{{ $featuredProperty['allocation'] }}</p></div>
+                <div class="plain-panel" data-reveal><h3>Construction after allocation</h3><p>{{ $featuredProperty['construction'] }}</p></div>
             </div>
             <div class="mt-12 max-w-4xl"><h2 class="text-2xl font-semibold">Legal and administrative policies</h2><ul class="mt-6 space-y-4 leading-7 text-ink-500">@foreach ($featuredProperty['policies'] as $policy)<li class="feature-line">{{ $policy }}</li>@endforeach</ul></div>
         </div>
@@ -91,10 +91,12 @@
 
     <section class="section-space bg-ink-50">
         <div class="site-container grid gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-            <div><x-site.section-heading eyebrow="Omu Creek FAQ" heading="Questions relevant to a purchase decision." /><a href="{{ route('faq') }}" class="text-link mt-7">View All FAQs</a></div>
+            <div><x-site.section-heading eyebrow="Omu Creek FAQ" heading="Answers for an informed next step." /><a href="{{ route('faq') }}" class="text-link mt-7">View All FAQs</a></div>
             <x-site.faq :items="$faqs" id-prefix="omu-detail-faq" />
         </div>
     </section>
+
+    <x-site.testimonial-section :items="$testimonials" eyebrow="Omu Creek experiences" heading="Feedback specifically connected to Omu Creek." />
 
     <x-site.conversion-cta heading="Request an Omu Creek inspection." intro="Share your preferred date and contact information. A Selotemna representative will follow up; submitting the request does not confirm an appointment." :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])" secondary-label="Contact Selotemna" :secondary-href="route('contact')">
         <p class="mt-6 text-sm leading-6 text-white/70">{{ $featuredProperty['disclaimer'] }}</p>

@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\InspectionRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -12,12 +13,11 @@ class InspectionRequestMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /** @param array<string, mixed> $details */
-    public function __construct(public readonly array $details) {}
+    public function __construct(public readonly InspectionRequest $inspection) {}
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: 'New Selotemna inspection request');
+        return new Envelope(subject: 'New Selotemna inspection request '.$this->inspection->reference);
     }
 
     public function content(): Content

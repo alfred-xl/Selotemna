@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
 @section('content')
-    <x-site.page-hero eyebrow="Frequently Asked Questions" heading="Omu Creek questions, answered." intro="Review the approved information about the opportunity, title, prices, payments, infrastructure, allocation and policies." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'FAQ']]" />
+    <x-site.page-hero eyebrow="Omu Creek · Frequently Asked Questions" heading="Clear answers before your next step." intro="Review the approved information about Selotemna’s Upcoming Project, including the opportunity, title, prices, payments, infrastructure, allocation and policies." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'FAQ']]" />
 
     <section class="section-space bg-white">
         <div class="site-container max-w-5xl space-y-16">
@@ -14,5 +14,5 @@
         </div>
     </section>
 
-    <x-site.conversion-cta heading="Ready to review Omu Creek in person?" intro="Submit an inspection request with your preferred date. A Selotemna representative will follow up; the request does not confirm an appointment." :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])" secondary-label="View Omu Creek" :secondary-href="route('omu-creek')" />
+    <x-site.conversion-cta heading="Ready to continue with Omu Creek?" intro="Review the complete project information or submit an inspection request with your preferred date. A representative will follow up; the request does not confirm an appointment." :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])" secondary-label="View Omu Creek" :secondary-href="route('omu-creek')" />
 @endsection

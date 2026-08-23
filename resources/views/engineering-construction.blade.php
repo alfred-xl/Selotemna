@@ -1,13 +1,57 @@
 @extends('layouts.site')
 
 @section('content')
-    <x-site.page-hero eyebrow="Engineering & Construction" heading="Engineering and construction shaped around clear project requirements." intro="Start with a project discussion so the Selotemna team can understand the site, scope and next step." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'Engineering & Construction']]" />
+    <x-site.page-hero eyebrow="Engineering & Construction" heading="Bring your project requirement into focus." intro="Start with the information you already have so Selotemna can understand the proposed site, scope, current stage and appropriate next conversation." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'Engineering & Construction']]" />
 
-    <section class="section-space bg-white"><div class="site-container grid gap-12 lg:grid-cols-2 lg:gap-20"><x-site.section-heading eyebrow="Division introduction" heading="A practical route into a project conversation." intro="This division supports discussions around residential, commercial and real-estate development requirements. Detailed capability claims are published only when verified." /><div><h2 class="text-2xl font-semibold">General capability areas</h2><ul class="mt-6 grid gap-3 sm:grid-cols-2"><li class="feature-line">Residential projects</li><li class="feature-line">Commercial projects</li><li class="feature-line">Real-estate development requirements</li><li class="feature-line">Site and scope assessment</li><li class="feature-line">Construction enquiries</li><li class="feature-line">Project discussions</li></ul></div></div></section>
+    <section class="section-space bg-white">
+        <div class="site-container grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
+            <div>
+                <x-site.section-heading eyebrow="Division introduction" heading="A practical starting point for engineering and construction enquiries." intro="This division provides a direct pathway for people and organisations preparing engineering, building or construction requirements." />
+                <h2 class="mt-10 text-2xl font-semibold">Information that helps begin the discussion</h2>
+                <ul class="mt-6 grid gap-3 sm:grid-cols-2">
+                    <li class="feature-line">Project type</li>
+                    <li class="feature-line">Proposed location</li>
+                    <li class="feature-line">Current project stage</li>
+                    <li class="feature-line">Available scope information</li>
+                    <li class="feature-line">Site information</li>
+                    <li class="feature-line">Preferred contact method</li>
+                </ul>
+            </div>
+            @if ($media['earthworks_truck'])
+                <figure class="overflow-hidden rounded-[1.5rem] border border-ink-200 bg-ink-50" data-reveal="media">
+                    <img src="{{ $media['earthworks_truck'] }}" alt="Dump truck operating on an active earthworks site" class="aspect-[4/5] w-full object-cover object-bottom" width="1280" height="1920" loading="eager">
+                </figure>
+            @else
+                <div class="brand-media flex aspect-[4/5] items-center justify-center p-8" aria-hidden="true" data-reveal="media">
+                    <img src="{{ asset('assets/logo.png') }}" alt="" class="w-28 rounded-xl bg-white p-3" width="189" height="153">
+                </div>
+            @endif
+        </div>
+    </section>
 
-    <section class="section-space bg-ink-50"><div class="site-container"><x-site.section-heading eyebrow="Clients and requirements" heading="Begin with the proposed project." intro="Selotemna welcomes enquiries from individuals, families, businesses, property clients and development clients with a defined or emerging requirement." /><div class="mt-10 grid gap-6 md:grid-cols-3"><div class="plain-panel"><h3>1. Share the requirement</h3><p>Describe the project type, proposed location, current stage and broad scope.</p></div><div class="plain-panel"><h3>2. Discuss the site and scope</h3><p>The team reviews the information available and identifies what should be discussed next.</p></div><div class="plain-panel"><h3>3. Continue the enquiry</h3><p>Selotemna follows up through a configured contact channel to continue the project discussion.</p></div></div></div></section>
+    <section class="section-space bg-ink-50">
+        <div class="site-container grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
+            @if ($media['building_construction'])
+                <figure class="overflow-hidden rounded-[1.5rem] border border-ink-200 bg-white" data-reveal="media">
+                    <img src="{{ $media['building_construction'] }}" alt="Construction worker applying render to a building façade from scaffolding" class="aspect-video w-full object-cover" width="1280" height="720" loading="lazy">
+                </figure>
+            @else
+                <div class="brand-media flex aspect-video items-center justify-center p-8" aria-hidden="true" data-reveal="media">
+                    <img src="{{ asset('assets/logo.png') }}" alt="" class="w-24 rounded-xl bg-white p-3" width="189" height="153">
+                </div>
+            @endif
+            <div>
+                <x-site.section-heading eyebrow="Enquiry pathway" heading="Move from an initial requirement to a focused next step." intro="The first conversation is intended to establish context. It does not promise a scope, programme or delivery outcome before the available information has been reviewed." />
+                <ol class="mt-8 space-y-5 text-ink-500" data-reveal-group>
+                    <li class="numbered-step" data-reveal><span>1</span><p>Share the proposed project, location, current stage and the information already available.</p></li>
+                    <li class="numbered-step" data-reveal><span>2</span><p>Allow the Selotemna team to review the requirement and identify any important follow-up questions.</p></li>
+                    <li class="numbered-step" data-reveal><span>3</span><p>Continue through a configured contact channel with a clearer understanding of the next conversation.</p></li>
+                </ol>
+            </div>
+        </div>
+    </section>
 
-    <section class="section-space bg-white"><div class="site-container"><div class="flex flex-col gap-6 md:flex-row md:items-end md:justify-between"><x-site.section-heading eyebrow="Relevant projects" heading="Engineering and construction projects." intro="Project categories provide a consistent route to verified work when records are approved for publishing." /><a href="{{ route('projects.index') }}" class="text-link shrink-0">View All Projects</a></div><div class="mt-10"><x-site.project-tabs :groups="$projectGroups" id-prefix="engineering-projects" /></div></div></section>
+    <x-site.testimonial-section :items="$testimonials" eyebrow="Engineering & Construction experiences" heading="Feedback relevant to project requirements." />
 
-    <x-site.conversion-cta heading="Discuss an engineering or construction requirement." intro="Contact Selotemna with the project type, proposed location, current stage and the scope information you already have." primary-label="Start a Project Enquiry" :primary-href="route('contact')" secondary-label="Explore Projects" :secondary-href="route('projects.index')" />
+    <x-site.conversion-cta heading="Start an engineering or construction conversation." intro="Contact Selotemna with the proposed project type, location, current stage and the scope information you already have." primary-label="Start a Project Enquiry" :primary-href="route('contact')" secondary-label="About Selotemna" :secondary-href="route('about')" />
 @endsection

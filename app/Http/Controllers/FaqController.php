@@ -13,7 +13,7 @@ class FaqController extends Controller
     {
         return view('faq', [
             'title' => 'Omu Creek Frequently Asked Questions | Selotemna',
-            'description' => 'Read approved answers about Omu Creek location, title, plot sizes, pricing, payments, charges, infrastructure, allocation and policies.',
+            'description' => 'Read approved answers about the Omu Creek Upcoming Project, including its location, title, pricing, charges, allocation and policies.',
             'faqGroups' => $this->content->faqGroups(),
             'contact' => $this->content->contactDetails(),
         ]);
