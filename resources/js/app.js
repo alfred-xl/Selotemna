@@ -335,6 +335,8 @@ document.querySelectorAll('[data-project-tabs]').forEach((tabGroup) => {
             tab.tabIndex = isActive ? 0 : -1;
             if (panel) {
                 panel.hidden = !isActive;
+                panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+                if ('inert' in panel) panel.inert = !isActive;
                 if (isActive) activePanel = panel;
             }
         });

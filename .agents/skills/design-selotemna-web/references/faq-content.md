@@ -103,5 +103,5 @@ Yes. If a buyer discontinues the transaction before full payment, a refund can b
 - Keep the homepage preview to the approved four questions.
 - Place all 15 questions on the dedicated FAQ page.
 - Preserve the request-based inspection language elsewhere on the homepage.
-- Do not assign Omu Creek an ongoing, completed, or upcoming project status.
+- Keep Omu Creek’s approved Upcoming Project status separate from claims about current availability or completion.
 - Do not add facts beyond this approved source and the verified Omu Creek structured data.

@@ -18,7 +18,7 @@ Blade, CSS, JavaScript, routes, controllers, configuration, mail handling, and f
 - Vite
 - Sora and Manrope
 - Minimal framework-free JavaScript
-- Omu Creek is the sole published project
+- Selotemna has undertaken previous projects; Omu Creek is its latest project and the current project with detailed public information in the repository
 - Persisted, request-oriented Omu Creek inspection workflow
 
 ## Approved business positioning
@@ -47,7 +47,7 @@ The site now provides:
 - `/faq` — complete approved FAQ
 - `/contact` — configured contact channels and enquiry pathways
 
-The homepage is a concise overview that introduces the company and its two divisions, features Omu Creek as the sole published Upcoming Project, and routes visitors to dedicated pages.
+The homepage is a concise overview that introduces the company and its two divisions, acknowledges its wider development history, features Omu Creek as the latest Upcoming Project, and routes visitors to dedicated pages.
 
 A generic Project Detail route is not implemented because verified project records and slugs have not been supplied.
 
@@ -55,23 +55,23 @@ A generic Project Detail route is not implemented because verified project recor
 
 Projects are now an important website content type.
 
-The Projects page supports:
+The Projects page always presents these stage tabs in this order:
 
-- Ongoing Projects
-- Completed Projects
-- Upcoming Projects
+1. Upcoming
+2. Ongoing
+3. Completed
 
-These labels are factual statuses. Omu Creek is currently the only published record and is classified as an Upcoming Project. Ongoing and Completed categories remain hidden until verified records exist.
+These labels are factual statuses. Omu Creek is the current project with a detailed public record in the repository and is classified as an Upcoming Project. This publishing boundary must not be presented as the limit of Selotemna’s wider project history. Ongoing and Completed remain visible with honest empty states until approved records exist.
 
 A future generic Project Detail page should present only approved project information, media, scope, location, status, and actions appropriate to that project.
 
 ## Verified project data
 
-The repository no longer contains development-only project records. The public catalogue contains Omu Creek only. Do not add demo records to the public project configuration; add another project only after its name, division, status, summary, media and public route have been approved.
+The repository no longer contains development-only project records. Its public catalogue currently has a detailed record for Omu Creek. Selotemna has undertaken previous projects, but their names, locations, media and details have not been supplied and must not be invented. Do not add demo records to the public project configuration; add another project only after its name, division, status, summary, media and public route have been approved.
 
 ## Omu Creek
 
-Omu Creek remains the verified featured land opportunity under Real Estate Development.
+Omu Creek remains the verified featured land opportunity under Real Estate Development and is Selotemna’s latest project. Do not describe it as the company’s first or only project.
 
 Preserve these facts exactly:
 
@@ -105,7 +105,7 @@ The homepage uses the approved four-question preview. The dedicated FAQ page con
 The homepage uses:
 
 1. Concise corporate hero
-2. Two division pathways
+2. An asymmetric two-division pathway section with an editorial introduction and stacked actions
 3. Verified Omu Creek Upcoming Project feature under Real Estate Development
 4. Short About summary
 5. Verified testimonial preview when approved records exist
@@ -114,6 +114,8 @@ The homepage uses:
 8. Footer
 
 Detailed division, opportunity, project, inspection, FAQ, and contact content lives on dedicated pages.
+
+The homepage “What we do” section uses an approximately 38/62 asymmetric editorial layout. Its left column carries the eyebrow `What we do`, the heading `Explore our developments. Discuss your next project.`, and the approved two-division introduction. Its right column uses thin dividers and restrained `01` and `02` markers for the Real Estate Development and Engineering & Construction pathways. Omu Creek is described there as Selotemna’s latest project, never its only project.
 
 ## Implemented work
 
@@ -129,9 +131,9 @@ The approved phase completed the following work.
 ### Stage 2 — Projects foundation
 
 - removed all environment-filtered temporary project arrays;
-- established Omu Creek as the sole Upcoming Project;
+- established Omu Creek as the latest Upcoming Project and current detailed public project record, without limiting Selotemna’s wider project history;
 - retained the Projects route without a fictional generic detail route;
-- hid categories that do not contain verified records.
+- retained permanent Upcoming, Ongoing, and Completed tabs, using honest empty states where verified records are not yet published.
 
 ### Stage 3 — Dedicated division pages
 
@@ -173,7 +175,7 @@ Keep these foundations and the content hierarchy aligned in future changes.
 
 The active logo is public/assets/logo.png, a 189 × 153 transparent raster asset. Request a production SVG or higher-resolution transparent PNG before launch. Do not redraw or alter the wordmark.
 
-Two approved Omu Creek videos are integrated from public Cloudflare R2 development URLs: a short preview in the Omu Creek feature and a detailed video on the dedicated Omu Creek page. Three approved editorial image placements use `selotemna-development-aerial.jpg`, `selotemna-earthworks-truck.jpg`, and `selotemna-building-construction.jpg` from `public/assets/images` when those files are present. Video poster images, accessible captions/transcripts and a production R2 custom domain remain outstanding.
+Two approved Omu Creek videos are served through the production custom domain `selotemna.boatengalfred.work`: a short preview in the Omu Creek feature and a detailed video on the dedicated Omu Creek page. Three approved editorial image placements use `selotemna-development-aerial.jpg`, `selotemna-earthworks-truck.jpg`, and `selotemna-building-construction.jpg` from `public/assets/images` when those files are present. Video poster images and accessible captions/transcripts remain outstanding.
 
 Book Inspection and Contact use the local `selotemna-inspection-consultation.jpg` and `selotemna-contact-meeting.jpg` files downloaded from credited Pexels source pages retained in `config/selotemna.php`. Public captions identify them as editorial imagery. They must not be described as Selotemna staff, offices, projects or customers.
 
@@ -190,6 +192,5 @@ Testimonials are supported but remain hidden until a quote, public name, relevan
 7. Commercial-use confirmation and source files for the three supplied editorial images
 8. Approved testimonial quotations, identities, service relevance and publication permission
 9. Omu Creek video posters and accessible captions/transcripts
-10. Production custom domain for the approved Omu Creek videos currently served through `r2.dev`
-11. Inspection-request privacy notice, retention period and deletion process
-12. Future staff handling method for saved requests beyond database records and optional email notification
+10. Inspection-request privacy notice, retention period and deletion process
+11. Future staff handling method for saved requests beyond database records and optional email notification

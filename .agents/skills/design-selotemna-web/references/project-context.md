@@ -57,13 +57,13 @@ Projects are an important public content type. The implemented Projects experien
 - Completed Projects
 - Upcoming Projects
 
-A project must not receive one of these statuses until the status is verified.
+A project must not receive one of these statuses until the status is verified. Omu Creek is classified as an Upcoming Project.
 
-Temporary project arrays remain in PHP configuration for development and layout testing. They are visibly identified as layout samples outside production and automatically removed in production. Production renders one useful empty state per category. Temporary data must not be used for SEO, structured data, analytics reporting, or public proof.
+The public project configuration contains no demo or layout-sample records. Demo data may be used only in an isolated development or layout-testing context, must be disabled by default in production, and must never be presented as verified Selotemna work.
 
 ## Verified Omu Creek facts
 
-Omu Creek is the verified featured land opportunity under Real Estate Development.
+Selotemna has undertaken previous projects. Omu Creek is the company’s latest project, the verified featured land opportunity under Real Estate Development, and the current project with detailed public information in the repository. Do not describe it as Selotemna’s first or only project, and do not invent records for previous work.
 
 Preserve these facts exactly:
 
@@ -76,7 +76,7 @@ Preserve these facts exactly:
 - Prices exclude applicable taxes.
 - Availability and property information are subject to confirmation.
 
-Omu Creek’s project status is unconfirmed. Do not classify it as ongoing, completed, or upcoming.
+Omu Creek is classified as an Upcoming Project. The status describes its project-development stage; availability and property information remain subject to confirmation.
 
 The approved FAQ source now verifies location, title claims, payment terms, statutory charges, documentation stages, planned infrastructure, allocation timing, construction guidance, default terms, resale terms, and refund terms. Use references/faq-content.md for the complete approved wording. Do not infer facts beyond that source.
 
@@ -100,14 +100,13 @@ Do not introduce a client-side application framework unless the repository has m
 
 The active supplied logo is public/assets/logo.png. It is a low-resolution raster asset; request a transparent SVG or higher-resolution transparent PNG before launch-quality delivery.
 
-There is no verified full project catalogue, testimonial set, statistics, operating-location list, or complete contact information. Hide missing content or use silent decorative brand surfaces. Never expose planning notes or temporary records as public facts.
+There is no verified full project catalogue, testimonial set, statistics, operating-location list, or complete contact information. Selotemna’s previous project history may be acknowledged collectively, but names, locations, images, statistics and details must not be invented. Hide missing content or use silent decorative brand surfaces. Never expose planning notes or temporary records as public facts.
 
 ## Decisions awaiting confirmation
 
 - Property Management scope and future page placement
 - Definitions and editorial approval criteria for the three project statuses
 - Which verified Selotemna work belongs in each project category
-- Omu Creek’s project status
 - Verified project-detail records, slugs, media, and fields
 - Detailed Engineering & Construction capabilities
 - Verified company contact details and operating locations beyond the approved Omu Creek FAQ

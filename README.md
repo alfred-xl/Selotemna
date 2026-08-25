@@ -30,19 +30,19 @@ The homepage routes detailed exploration to these pages. A generic Project Detai
 
 ## Projects direction
 
-The Projects experience supports:
+The Projects page always presents these stage tabs in this order:
 
-- Ongoing Projects
-- Completed Projects
-- Upcoming Projects
+1. Upcoming
+2. Ongoing
+3. Completed
 
-Use a project status only when verified. Omu Creek is currently the sole published project and is classified as an Upcoming Project. Ongoing and Completed categories remain hidden until verified records exist.
+Stages without approved public records use honest empty states rather than placeholder projects. Use a project status only when verified. Selotemna has undertaken previous projects, while Omu Creek is the latest project and the current project with detailed public information in this repository. It is classified as an Upcoming Project.
 
 The project catalogue contains no demo or layout-sample records.
 
 ## Verified Omu Creek opportunity
 
-Omu Creek remains a verified featured land opportunity under Real Estate Development.
+Omu Creek remains the verified featured land opportunity under Real Estate Development and is Selotemna’s latest project. This does not imply that it is the company’s first or only project.
 
 Preserve these facts exactly:
 
@@ -100,9 +100,9 @@ Verified contact actions are hidden until values are provided:
 
 Omu Creek media is configured through:
 
-    SELOTEMNA_OMU_CREEK_VIDEO_URL="https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/OMU%20CREEK%202%20VIDEO%201.mp4"
+    SELOTEMNA_OMU_CREEK_VIDEO_URL="https://selotemna.boatengalfred.work/OMU%20CREEK%202%20VIDEO%201.mp4"
     SELOTEMNA_OMU_CREEK_VIDEO_POSTER=
-    SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL="https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/SHORT%20FORM%201.mp4"
+    SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL="https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4"
     SELOTEMNA_OMU_CREEK_SHORT_VIDEO_POSTER=
 
 Without a video URL, Omu Creek uses a decorative branded panel. If a published video contains speech, provide captions or a transcript.

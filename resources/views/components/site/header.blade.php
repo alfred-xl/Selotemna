@@ -102,7 +102,7 @@
                 @if (request()->routeIs('home')) aria-current="page" @endif>Home</a>
             <a href="{{ route('about') }}" class="mobile-nav-link" data-menu-link
                 @if (request()->routeIs('about')) aria-current="page" @endif>About</a>
-            <p class="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-brand-700">Divisions</p>
+            <p class="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-brand-700">Services</p>
             <a href="{{ route('real-estate-development') }}" class="mobile-nav-link" data-menu-link
                 @if (request()->routeIs('real-estate-development')) aria-current="page" @endif>Real Estate Development</a>
             <a href="{{ route('engineering-construction') }}" class="mobile-nav-link" data-menu-link

@@ -2,6 +2,7 @@
 
 use App\Mail\InspectionRequestMail;
 use App\Models\InspectionRequest;
+use App\Support\SelotemnaContent;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -10,11 +11,11 @@ function publicRoutes(): array
 {
     return [
         'home' => 'Developing places. Building with purpose.',
-        'about' => 'A focused company for property opportunities and project requirements.',
-        'real-estate-development' => 'Explore property opportunities with the facts in view.',
+        'about' => 'About',
+        'real-estate-development' => 'Real Estate Development',
         'omu-creek' => 'Omu Creek',
-        'engineering-construction' => 'Bring your project requirement into focus.',
-        'projects.index' => 'One published project. A clear view of its current stage.',
+        'engineering-construction' => 'Engineering & Construction',
+        'projects.index' => 'Projects',
         'faq' => 'Clear answers before your next step.',
         'inspections.create' => 'Request an Omu Creek inspection.',
         'contact' => 'Start with the right conversation.',
@@ -63,6 +64,205 @@ it('renders exactly one h1 and unique metadata on every page', function () {
         ->and($descriptions)->not->toContain(null)->toHaveCount(count(array_unique($descriptions)));
 });
 
+it('uses the reusable centred image overlay hero on the approved pages', function () {
+    $about = $this->get(route('about'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $about, $hero);
+
+    expect($hero)->not->toBeEmpty()
+        ->and(substr_count($hero[0], '<h1'))->toBe(1)
+        ->and($hero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-image')
+        ->toContain(asset('assets/images/selotemna-development-aerial.jpg'))
+        ->toContain('object-cover')
+        ->toContain('data-page-hero-focal-position')
+        ->toContain('style="object-position: 62% 52%;"')
+        ->toContain('data-page-hero-overlay')
+        ->toContain('bg-ink-950/50')
+        ->toContain('bg-linear-to-r')
+        ->toContain('from-ink-950/80')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('min-h-[22.5rem]')
+        ->toContain('md:min-h-[27.5rem]')
+        ->toContain('lg:min-h-[29rem]')
+        ->toContain('mx-auto max-w-[43.75rem] text-center')
+        ->toContain('text-[clamp(2.5rem,12vw,2.75rem)]')
+        ->toContain('md:text-[clamp(3.5rem,7vw,4rem)]')
+        ->toContain('max-w-[43.75rem] text-lg leading-8 md:text-xl')
+        ->toContain('data-hero-sequence')
+        ->toContain('data-hero-item')
+        ->toContain('fetchpriority="high"')
+        ->toContain('>About</h1>')
+        ->toContain('Real estate development, engineering and construction under one company.')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->not->toContain('aria-label="Breadcrumb"')
+        ->not->toContain('About Selotemna')
+        ->not->toContain('Selotemna Limited develops property opportunities');
+
+    config()->set('selotemna.featured_property.short_video_poster', 'https://media.example.test/omu-creek-short-poster.jpg');
+
+    $development = $this->get(route('real-estate-development'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $development, $developmentHero);
+
+    expect($developmentHero)->not->toBeEmpty()
+        ->and(substr_count($developmentHero[0], '<h1'))->toBe(1)
+        ->and($developmentHero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('https://media.example.test/omu-creek-short-poster.jpg')
+        ->toContain('style="object-position: 50% 50%;"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('min-h-[22.5rem]')
+        ->toContain('lg:min-h-[29rem]')
+        ->toContain('>Real Estate Development</h1>')
+        ->toContain('Explore Selotemna’s development work and current property opportunities.')
+        ->toContain('data-hero-sequence')
+        ->toContain('data-hero-item')
+        ->toContain('data-page-hero-overlay')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->not->toContain('class="eyebrow')
+        ->not->toContain('<video')
+        ->not->toContain('autoplay');
+
+    $engineering = $this->get(route('engineering-construction'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $engineering, $engineeringHero);
+
+    expect($engineeringHero)->not->toBeEmpty()
+        ->and(substr_count($engineeringHero[0], '<h1'))->toBe(1)
+        ->and($engineeringHero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain(asset('assets/images/selotemna-building-construction.jpg'))
+        ->toContain('style="object-position: 38% 48%;"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('min-h-[22.5rem]')
+        ->toContain('lg:min-h-[29rem]')
+        ->toContain('>Engineering &amp; Construction</h1>')
+        ->toContain('Share your project requirements and begin a focused engineering or construction conversation.')
+        ->toContain('data-hero-sequence')
+        ->toContain('data-hero-item')
+        ->toContain('data-page-hero-overlay')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->not->toContain('class="eyebrow');
+
+    $projects = $this->get(route('projects.index'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $projects, $projectsHero);
+
+    expect($projectsHero)->not->toBeEmpty()
+        ->and(substr_count($projectsHero[0], '<h1'))->toBe(1)
+        ->and($projectsHero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('https://media.example.test/omu-creek-short-poster.jpg')
+        ->toContain('style="object-position: 50% 50%;"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('min-h-[22.5rem]')
+        ->toContain('lg:min-h-[29rem]')
+        ->toContain('>Projects</h1>')
+        ->toContain('Explore Selotemna’s development work by project stage.')
+        ->toContain('data-hero-sequence')
+        ->toContain('data-hero-item')
+        ->toContain('data-page-hero-overlay')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->not->toContain('class="eyebrow')
+        ->not->toContain('<video')
+        ->not->toContain('autoplay');
+
+    $faq = $this->get(route('faq'))->assertOk()->getContent();
+    expect($faq)->toContain('data-page-hero-variant="default"')
+        ->not->toContain('data-page-hero-variant="overlay"')
+        ->not->toContain('data-page-hero-overlay');
+});
+
+it('uses the branded hero fallback when the construction image is unavailable', function () {
+    config()->set('selotemna.media.building_construction', 'assets/images/missing-building-construction.jpg');
+
+    $content = $this->get(route('engineering-construction'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero[0])->toContain('data-page-hero-fallback')
+        ->toContain('bg-brand-950')
+        ->toContain(asset('assets/logo.png'))
+        ->toContain('data-page-hero-overlay')
+        ->not->toContain('data-page-hero-image');
+});
+
+it('uses the development aerial when the Omu Creek hero poster is unavailable', function () {
+    config()->set('selotemna.featured_property.short_video_poster', null);
+
+    foreach (['real-estate-development', 'projects.index'] as $routeName) {
+        $content = $this->get(route($routeName))->assertOk()->getContent();
+        preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+        expect($hero[0])->toContain(asset('assets/images/selotemna-development-aerial.jpg'))
+            ->toContain('data-page-hero-image')
+            ->not->toContain('data-page-hero-fallback');
+    }
+});
+
+it('uses the branded About hero fallback when the configured aerial image is unavailable', function () {
+    config()->set('selotemna.media.development_aerial', 'assets/images/missing-development-aerial.jpg');
+
+    $content = $this->get(route('about'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-fallback')
+        ->toContain('bg-brand-950')
+        ->toContain(asset('assets/logo.png'))
+        ->toContain('data-page-hero-overlay')
+        ->not->toContain('data-page-hero-image')
+        ->not->toContain('fetchpriority="high"');
+});
+
+it('renders the simplified About page content, services, audiences and closing actions', function () {
+    $content = $this->get(route('about'))->assertOk()->getContent();
+    $text = preg_replace('/\s+/', ' ', html_entity_decode(preg_replace('/<[^>]+>/', ' ', $content)));
+
+    expect($content)->toContain('<meta name="description" content="Learn about Selotemna’s real estate development, engineering and construction work, including current property opportunities and project enquiry pathways.">')
+        ->toContain('data-about-company')
+        ->toContain('data-about-divisions')
+        ->toContain('data-about-audiences')
+        ->not->toContain('data-about-process')
+        ->and($text)->toContain('About Real estate development, engineering and construction under one company.')
+        ->toContain('Who we are')
+        ->toContain('A company working across property development, engineering and construction.')
+        ->toContain('Selotemna Limited is a Nigerian company working across real estate development, engineering and construction. Through its development work, the company presents land and property opportunities, including Omu Creek, its latest project. Through engineering and construction, Selotemna provides a direct starting point for people and organisations preparing project requirements.')
+        ->toContain('The available information is presented clearly so visitors can understand the opportunity or requirement and continue towards an appropriate inspection or project conversation.')
+        ->toContain('Company registration RC 7361086')
+        ->toContain('What we do From property development opportunities to engineering and construction requirements.')
+        ->toContain('Explore Selotemna’s development work and published property opportunities. Omu Creek is the latest project and the current opportunity with detailed public information available.')
+        ->toContain('Share the proposed site, scope and current stage of an engineering or construction requirement so Selotemna can understand the project and identify the appropriate next conversation.')
+        ->toContain('Who we support')
+        ->toContain('People and organisations making property or project decisions.')
+        ->toContain('Selotemna supports different property interests and project requirements through clear, relevant starting points.')
+        ->toContain('Property and land buyers')
+        ->toContain('Families and investors')
+        ->toContain('Nigerians in the diaspora')
+        ->toContain('Businesses and organisations')
+        ->toContain('Engineering and construction clients')
+        ->toContain('What would you like to discuss?')
+        ->toContain('Explore Selotemna’s current development opportunities or continue with an engineering or construction requirement.')
+        ->toContain('Explore Real Estate Development')
+        ->toContain('Discuss an Engineering or Construction Project')
+        ->not->toContain('How to begin')
+        ->not->toContain('Choose a division')
+        ->not->toContain('two focused public divisions')
+        ->and(substr_count($content, 'data-primary-division'))->toBe(2)
+        ->and($content)->toContain('href="'.route('real-estate-development').'"')
+        ->toContain('href="'.route('engineering-construction').'"')
+        ->not->toContain('data-stat');
+
+    $orderedContent = [
+        'data-page-hero-variant="overlay"',
+        'data-about-company',
+        'data-about-divisions',
+        'data-about-audiences',
+        'What would you like to discuss?',
+    ];
+    $positions = array_map(fn (string $needle): int|false => strpos($content, $needle), $orderedContent);
+
+    expect($positions)->not->toContain(false)
+        ->and($positions)->toBe(collect($positions)->sort()->values()->all());
+});
+
 it('uses implemented named routes throughout shared navigation', function () {
     $content = $this->get(route('home'))->getContent();
 
@@ -102,8 +302,12 @@ it('provides accessible desktop navigation and a viewport-level mobile drawer', 
         ->toContain('aria-controls="mobile-navigation"')
         ->toContain('aria-modal="true"')
         ->toContain('data-menu-root inert')
+        ->toContain('Services &amp; projects')
+        ->toContain('Explore Selotemna’s development opportunities or begin an engineering or construction enquiry.')
         ->not->toContain('data-mobile-contact-bar')
         ->and(strpos($content, '</header>'))->toBeLessThan(strpos($content, 'data-menu-root'))
+        ->and((bool) preg_match('/data-divisions-toggle[^>]*>\s*Services/s', $content))->toBeTrue()
+        ->and((bool) preg_match('/tracking-\[0\.14em\][^>]*>Services<\/p>/', $content))->toBeTrue()
         ->and((bool) preg_match('/href="'.$inspectionUrl.'"\s+class="mobile-nav-link"[^>]*data-menu-link/s', $content))->toBeTrue();
 
     $script = file_get_contents(resource_path('js/app.js'));
@@ -115,16 +319,242 @@ it('provides accessible desktop navigation and a viewport-level mobile drawer', 
         ->not->toContain('mobileContactBar');
 });
 
-it('shows exactly two primary homepage divisions and no retired architecture', function () {
-    $content = $this->get(route('home'))->getContent();
+it('uses visitor-facing service labels on the service introductions', function () {
+    $development = $this->get(route('real-estate-development'))->assertOk()->getContent();
+    $engineering = $this->get(route('engineering-construction'))->assertOk()->getContent();
 
-    expect(substr_count($content, 'data-primary-division'))->toBe(2)
-        ->and($content)->toContain('Real Estate Development')
-        ->toContain('Engineering &amp; Construction')
+    expect($development)->toContain('Our development work')
+        ->not->toContain('Division overview')
+        ->and($engineering)->toContain('Engineering &amp; Construction')
+        ->not->toContain('Division introduction');
+});
+
+it('renders the streamlined Real Estate Development page and one final conversion choice', function () {
+    $content = $this->get(route('real-estate-development'))->assertOk()->getContent();
+    $text = preg_replace('/\s+/', ' ', html_entity_decode(preg_replace('/<[^>]+>/', ' ', $content)));
+
+    expect($content)->toContain('<meta name="description" content="Explore Selotemna’s real estate development work and Omu Creek, its latest project and current property opportunity with detailed public information.">')
+        ->toContain('data-development-introduction')
+        ->toContain('data-home-omu-creek')
+        ->and(substr_count($content, 'data-home-omu-creek'))->toBe(1)
+        ->and($text)->toContain('Our development work Development opportunities presented with the facts in view.')
+        ->toContain('Selotemna has undertaken previous real estate development projects. Omu Creek is the latest project and the current opportunity with detailed public information available.')
+        ->toContain('What you can review Published project information Current plot sizes and outright prices Title and documentation information Inspection and enquiry options')
+        ->toContain('Current outright prices')
+        ->toContain('Interested in Omu Creek?')
+        ->toContain('Review the complete project information or request an inspection with your preferred date and contact details.')
+        ->toContain('Request an Inspection')
+        ->toContain('View Full Project Details')
+        ->toContain('Submitting an inspection request does not automatically confirm an appointment.')
+        ->not->toContain('Evaluate the opportunity')
+        ->not->toContain('Enquiries and inspections')
+        ->not->toContain('Move from interest to an informed next step.')
+        ->not->toContain('Continue with Omu Creek or a direct enquiry.')
+        ->and($content)->not->toContain('plain-panel')
+        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('omu-creek').'"');
+});
+
+it('renders the focused Engineering and Construction enquiry page', function () {
+    config()->set('selotemna.whatsapp', '+2348000000000');
+
+    $content = $this->get(route('engineering-construction'))->assertOk()->getContent();
+    $text = preg_replace('/\s+/', ' ', html_entity_decode(preg_replace('/<[^>]+>/', ' ', $content)));
+
+    expect($content)->toContain('<meta name="description" content="Share an engineering or construction project requirement with Selotemna, including the proposed location, current stage, site and available scope information.">')
+        ->toContain('data-engineering-introduction')
+        ->toContain('data-engineering-process')
+        ->toContain(asset('assets/images/selotemna-building-construction.jpg'))
+        ->toContain(asset('assets/images/selotemna-earthworks-truck.jpg'))
+        ->and(substr_count($content, asset('assets/images/selotemna-building-construction.jpg')))->toBe(1)
+        ->and($text)->toContain('Starting a project enquiry Start with the information you already have.')
+        ->toContain('Share the proposed project, location, current stage and available scope information so Selotemna can understand the requirement and identify the important follow-up questions.')
+        ->toContain('Information that helps begin the discussion Project type Proposed location Current project stage Available scope information Site information Preferred contact method')
+        ->toContain('What happens next From an initial enquiry to a clearer project conversation.')
+        ->toContain('The first conversation is intended to establish context. It does not promise a scope, programme or delivery outcome before the available information has been reviewed.')
+        ->toContain('Share the requirement Provide the project type, proposed location, current stage and information already available.')
+        ->toContain('The information is reviewed Selotemna reviews the requirement and identifies any important follow-up questions.')
+        ->toContain('Continue the conversation Continue through the appropriate contact channel with a clearer understanding of what should be discussed next.')
+        ->toContain('Have a project requirement to discuss?')
+        ->toContain('Share the proposed project type, location, current stage and available scope information with Selotemna.')
+        ->toContain('Start a Project Enquiry')
+        ->toContain('Chat on WhatsApp')
+        ->not->toContain('Enquiry pathway')
+        ->not->toContain('Move from an initial requirement to a focused next step.')
+        ->not->toContain('Engineering & Construction experiences')
+        ->not->toContain('Feedback relevant to project requirements.')
+        ->not->toContain('>About Selotemna</a>')
+        ->not->toContain('Structural engineering')
+        ->not->toContain('Civil engineering')
+        ->not->toContain('Turnkey construction')
+        ->and($content)->toContain('href="'.route('contact').'"')
+        ->toContain('href="https://wa.me/2348000000000"');
+});
+
+it('uses one verified secondary contact action or hides it when unavailable', function () {
+    config()->set('selotemna.whatsapp', null);
+    config()->set('selotemna.phone', '+234 800 000 0000');
+
+    $phoneContent = $this->get(route('engineering-construction'))->assertOk()->getContent();
+    expect($phoneContent)->toContain('Call Selotemna')
+        ->toContain('href="tel:+2348000000000"')
+        ->not->toContain('Chat on WhatsApp');
+
+    config()->set('selotemna.phone', null);
+
+    $noContactContent = $this->get(route('engineering-construction'))->assertOk()->getContent();
+    expect($noContactContent)->not->toContain('Call Selotemna')
+        ->not->toContain('Chat on WhatsApp');
+});
+
+it('renders the approved asymmetric what we do pathways and no retired architecture', function () {
+    $content = $this->get(route('home'))->getContent();
+    preg_match('/<section[^>]*data-home-divisions[^>]*>.*?<\/section>/s', $content, $section);
+    $copy = html_entity_decode(strip_tags($section[0]));
+
+    expect($section)->not->toBeEmpty()
+        ->and(substr_count($section[0], 'data-primary-division'))->toBe(2)
+        ->and(substr_count($section[0], 'data-division-number'))->toBe(2)
+        ->and($section[0])->toContain('division-pathway-numbered')
+        ->toContain('data-division-number>01</span>')
+        ->toContain('data-division-number>02</span>')
+        ->toContain('href="'.route('real-estate-development').'"')
+        ->toContain('href="'.route('engineering-construction').'"')
+        ->not->toContain('rounded-xl border border-brand-100 bg-brand-50')
+        ->and($copy)->toContain('What we do')
+        ->toContain('Explore our developments. Discuss your next project.')
+        ->toContain('Selotemna operates through Real Estate Development and Engineering & Construction, giving visitors a clear way to explore our development work, review current opportunities or begin a project conversation.')
+        ->toContain('Explore Selotemna’s real-estate developments and property opportunities. Omu Creek, our latest project, is the current featured opportunity for buyers and investors to review before making an enquiry or requesting an inspection.')
+        ->toContain('Explore Real Estate Development')
+        ->toContain('Bring an engineering or construction requirement to Selotemna. Share the site, scope and current stage so the team can understand the project and identify the appropriate next step.')
+        ->toContain('Explore Engineering & Construction')
         ->not->toContain('Property Management')
         ->not->toContain('Land Sales')
         ->not->toContain('House Sales')
         ->not->toContain('Shortlet');
+});
+
+it('renders an immersive accessible homepage hero with protected actions and motion hooks', function () {
+    config()->set('selotemna.whatsapp', '+2348000000000');
+
+    $content = $this->get(route('home'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-home-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero)->not->toBeEmpty()
+        ->and(substr_count($hero[0], '<h1'))->toBe(1)
+        ->and(strip_tags($hero[0]))->toContain('Developing places. Building with purpose.')
+        ->and($hero[0])->toContain('data-hero-sequence')
+        ->toContain('data-hero-actions')
+        ->toContain('data-hero-item')
+        ->toContain('data-hero-media')
+        ->toContain('data-hero-overlay')
+        ->toContain('fetchpriority="high"')
+        ->toContain('w-full overflow-hidden bg-ink-950')
+        ->toContain('class="site-container relative z-20')
+        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('omu-creek').'"')
+        ->toContain('href="https://wa.me/2348000000000"')
+        ->toContain('data-event="book_inspection_click"')
+        ->toContain('data-event="whatsapp_click"')
+        ->not->toContain('site-container-wide')
+        ->not->toContain('rounded-[1.25rem]')
+        ->not->toContain('autoplay');
+});
+
+it('omits the homepage hero contact shortcut when WhatsApp is unavailable', function () {
+    config()->set('selotemna.whatsapp', null);
+
+    $content = $this->get(route('home'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-home-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero[0])->not->toContain('data-hero-whatsapp')
+        ->not->toContain('data-event="whatsapp_click"');
+});
+
+it('keeps the homepage hero readable when the aerial image is unavailable', function () {
+    config()->set('selotemna.media.development_aerial', 'assets/images/missing-development-aerial.jpg');
+
+    $content = $this->get(route('home'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-home-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero[0])->toContain('Developing places. Building with purpose.')
+        ->toContain('data-hero-media')
+        ->toContain('aria-hidden="true"')
+        ->toContain('bg-brand-950')
+        ->toContain('data-hero-overlay')
+        ->toContain('data-event="book_inspection_click"')
+        ->not->toContain('fetchpriority="high"');
+});
+
+it('renders the approved Omu Creek homepage project hierarchy and actions', function () {
+    config()->set('selotemna.whatsapp', '+2348000000000');
+
+    $content = $this->get(route('home'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-home-omu-creek[^>]*>.*?<\/section>/s', $content, $section);
+    $text = preg_replace('/\s+/', ' ', html_entity_decode(preg_replace('/<[^>]+>/', ' ', $section[0] ?? '')));
+
+    expect($section)->not->toBeEmpty()
+        ->and($section[0])->toContain('aspect-video')
+        ->toContain('data-event="omu_creek_short_video_play"')
+        ->toContain('data-reveal-group')
+        ->toContain('data-property-interest="Omu Creek"')
+        ->toContain('data-event="whatsapp_click"')
+        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('omu-creek').'"')
+        ->and($text)->toContain('LATEST PROJECT · REAL ESTATE DEVELOPMENT')
+        ->toContain('Omu Creek')
+        ->toContain(config('selotemna.featured_property.overview'))
+        ->toContain('Status Upcoming Project')
+        ->toContain('Opportunity Land allocation')
+        ->toContain('Title Lagos State Government Allocation')
+        ->toContain('Rate ₦50,000 per sqm')
+        ->toContain('Review the complete project information.')
+        ->toContain('Understand the information available before making an enquiry or requesting an inspection.')
+        ->toContain('Payment terms and applicable charges')
+        ->toContain('Documentation and allocation information')
+        ->toContain('Infrastructure plans and project policies')
+        ->toContain('Current outright prices')
+        ->toContain('300 sqm ₦15,000,000')
+        ->toContain('500 sqm ₦25,000,000')
+        ->toContain('1,000 sqm ₦50,000,000')
+        ->toContain(config('selotemna.featured_property.disclaimer'))
+        ->toContain('Request an Omu Creek Inspection')
+        ->toContain('View Full Project Details');
+
+    $orderedHooks = [
+        'data-omu-creek-media',
+        'data-omu-creek-summary',
+        'data-omu-creek-facts',
+        'data-omu-creek-information',
+        'data-omu-creek-prices',
+        'data-omu-creek-actions',
+    ];
+    $positions = array_map(fn (string $hook): int|false => strpos($section[0], $hook), $orderedHooks);
+
+    expect($positions)->not->toContain(false)
+        ->and($positions)->toBe(collect($positions)->sort()->values()->all())
+        ->and(strpos($section[0], 'Request an Omu Creek Inspection'))->toBeLessThan(strpos($section[0], 'View Full Project Details'));
+});
+
+it('renders the compact asymmetric homepage about transition', function () {
+    $content = $this->get(route('home'))->assertOk()->getContent();
+    preg_match('/<section[^>]*data-home-about[^>]*>.*?<\/section>/s', $content, $section);
+    $text = preg_replace('/\s+/', ' ', html_entity_decode(preg_replace('/<[^>]+>/', ' ', $section[0] ?? '')));
+
+    expect($section)->not->toBeEmpty()
+        ->and($section[0])->toContain('bg-brand-50')
+        ->toContain('border-y border-brand-100')
+        ->toContain('lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)]')
+        ->toContain('data-reveal')
+        ->toContain('class="text-link mt-6"')
+        ->toContain('href="'.route('about').'"')
+        ->not->toContain('<img')
+        ->not->toContain('<svg')
+        ->and($text)->toContain('About Selotemna')
+        ->toContain('Property opportunities and project requirements, brought under one company.')
+        ->toContain('Selotemna operates through Real Estate Development and Engineering & Construction. We help clients review published development opportunities and begin focused conversations about engineering or construction requirements.')
+        ->toContain('Learn About Selotemna')
+        ->not->toContain('A focused route from requirement to next step.');
 });
 
 it('shows exactly the four approved homepage faq questions', function () {
@@ -181,8 +611,8 @@ it('uses the approved Omu Creek videos in their intended locations without autop
     $homepage = $this->get(route('home'))->assertOk()->getContent();
     $detailPage = $this->get(route('omu-creek'))->assertOk()->getContent();
 
-    expect($featuredProperty['short_video_url'])->toBe('https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/SHORT%20FORM%201.mp4')
-        ->and($featuredProperty['video_url'])->toBe('https://pub-0625ccae8b454afab44be786c0943de3.r2.dev/OMU%20CREEK%202%20VIDEO%201.mp4')
+    expect($featuredProperty['short_video_url'])->toBe('https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4')
+        ->and($featuredProperty['video_url'])->toBe('https://selotemna.boatengalfred.work/OMU%20CREEK%202%20VIDEO%201.mp4')
         ->and($homepage)->toContain($featuredProperty['short_video_url'])
         ->toContain('data-event="omu_creek_short_video_play"')
         ->and($detailPage)->toContain($featuredProperty['video_url'])
@@ -219,19 +649,58 @@ it('publishes Omu Creek with its confirmed upcoming status only', function () {
         ->toContain('Availability and property information are subject to confirmation.');
 });
 
-it('does not render unnecessary tab controls for the single published project category', function () {
-    $content = $this->get(route('projects.index'))->getContent();
-    preg_match_all('/\sdata-project-tab>/', $content, $tabs);
-    preg_match_all('/\sdata-project-panel>/', $content, $panels);
+it('keeps project group filtering backward compatible while allowing permanent page stages', function () {
+    $content = app(SelotemnaContent::class);
+    $publishedGroups = $content->projectGroups();
+    $allStages = $content->projectGroups(includeEmptyGroups: true);
 
-    expect($tabs[0])->toHaveCount(0)
-        ->and($panels[0])->toHaveCount(0)
-        ->and($content)->not->toContain('role="tablist"')
-        ->not->toContain('role="tabpanel"')
-        ->toContain('Upcoming Projects');
+    expect(array_keys($publishedGroups))->toBe(['upcoming'])
+        ->and(array_keys($allStages))->toBe(['upcoming', 'ongoing', 'completed'])
+        ->and($allStages['upcoming']['label'])->toBe('Upcoming')
+        ->and($allStages['ongoing']['label'])->toBe('Ongoing')
+        ->and($allStages['completed']['label'])->toBe('Completed')
+        ->and($allStages['upcoming']['items'])->toHaveCount(1)
+        ->and($allStages['ongoing']['items'])->toBe([])
+        ->and($allStages['completed']['items'])->toBe([]);
 });
 
-it('publishes only Omu Creek and links to its existing detail page', function () {
+it('renders three ordered and accessible project stage tabs', function () {
+    $content = $this->get(route('projects.index'))->assertOk()->getContent();
+    $script = file_get_contents(resource_path('js/app.js'));
+    preg_match_all('/<button[^>]*data-project-tab[^>]*>.*?<\/button>/s', $content, $tabs);
+    preg_match_all('/<div[^>]*role="tabpanel"[^>]*>/', $content, $panels);
+
+    expect($tabs[0])->toHaveCount(3)
+        ->and($panels[0])->toHaveCount(3)
+        ->and($content)->toContain('role="tablist"')
+        ->toContain('aria-label="Project stages"')
+        ->toContain('id="all-projects-tab-upcoming"')
+        ->toContain('aria-selected="true"')
+        ->toContain('aria-controls="all-projects-panel-upcoming"')
+        ->toContain('tabindex="0"')
+        ->toContain('id="all-projects-tab-ongoing"')
+        ->toContain('aria-selected="false"')
+        ->toContain('aria-controls="all-projects-panel-ongoing"')
+        ->toContain('tabindex="-1"')
+        ->toContain('id="all-projects-panel-completed"')
+        ->toContain('aria-labelledby="all-projects-tab-completed"')
+        ->not->toContain('All Projects')
+        ->not->toContain('Completed (0)')
+        ->and($tabs[0][0])->toContain('aria-selected="true"')->toContain('tabindex="0"')
+        ->and($tabs[0][1])->toContain('aria-selected="false"')->toContain('tabindex="-1"')
+        ->and($tabs[0][2])->toContain('aria-selected="false"')->toContain('tabindex="-1"')
+        ->and(collect($panels[0])->every(fn (string $panel): bool => ! str_contains($panel, ' hidden')))->toBeTrue()
+        ->and(strpos($content, '>Upcoming</button>'))->toBeLessThan(strpos($content, '>Ongoing</button>'))
+        ->and(strpos($content, '>Ongoing</button>'))->toBeLessThan(strpos($content, '>Completed</button>'))
+        ->and($script)->toContain("if (event.key === 'ArrowLeft')")
+        ->toContain("if (event.key === 'ArrowRight')")
+        ->toContain("if (event.key === 'Home')")
+        ->toContain("if (event.key === 'End')")
+        ->toContain("panel.setAttribute('aria-hidden', isActive ? 'false' : 'true')")
+        ->toContain("if ('inert' in panel) panel.inert = !isActive");
+});
+
+it('publishes the featured Omu Creek record and honest project-stage empty states', function () {
     $content = $this->get(route('projects.index'))->getContent();
     preg_match_all('/<article[^>]*data-project-card[^>]*>.*?<\/article>/s', $content, $cards);
 
@@ -240,13 +709,36 @@ it('publishes only Omu Creek and links to its existing detail page', function ()
     expect($cards[0])->toHaveCount(1)
         ->and($cards[0][0])->toContain('Omu Creek')
         ->toContain('Upcoming Project')
+        ->toContain('Real Estate Development')
+        ->toContain(config('selotemna.projects.upcoming.items.0.summary'))
+        ->toContain('data-project-featured')
+        ->toContain('View Full Project Details')
+        ->toContain('Request an Inspection')
         ->toContain('href="'.route('omu-creek').'"')
+        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
         ->and($projects)->toHaveCount(1)
         ->and($projects->first()['name'])->toBe('Omu Creek')
         ->and(config('selotemna.temporary_projects'))->toBeNull()
+        ->and($content)->toContain('Project portfolio')
+        ->toContain('Explore projects by stage.')
+        ->toContain('Omu Creek is Selotemna’s latest project and the current project with detailed public information available. Previous project profiles will appear as their information is approved for publication.')
+        ->and($content)->toContain('Selotemna has undertaken previous projects.')
+        ->toContain('Upcoming Project describes the project stage; property availability remains subject to confirmation.')
+        ->toContain('No ongoing project profiles are currently published.')
+        ->toContain('New project information will appear here when it has been approved for public release.')
+        ->toContain('Completed project profiles are not yet published.')
+        ->toContain('Their names, locations, images and details will appear here as the information is approved for publication.')
+        ->not->toContain('sole published project')
+        ->not->toContain('only published project')
+        ->not->toContain('Selotemna’s only project')
         ->and($content)->not->toContain('Layout Sample')
         ->not->toContain('Development-only')
-        ->and(Route::has('projects.show'))->toBeFalse();
+        ->and(Route::has('projects.show'))->toBeFalse()
+        ->and($content)->toContain('<title>Projects | Selotemna</title>')
+        ->toContain('<meta name="description" content="Explore Selotemna projects by stage, including Omu Creek, the company’s latest project and current opportunity with detailed public information.">')
+        ->toContain('Interested in Omu Creek?')
+        ->toContain('Review the complete project information or request an inspection with your preferred date and contact details.')
+        ->toContain('Submitting an inspection request does not automatically confirm an appointment.');
 });
 
 it('keeps the same verified Omu Creek project in production', function () {
@@ -257,8 +749,11 @@ it('keeps the same verified Omu Creek project in production', function () {
         ->and($content)->toContain('Omu Creek')
         ->toContain('Upcoming Project')
         ->not->toContain('Layout Sample')
-        ->not->toContain('Ongoing Projects')
-        ->not->toContain('Completed Projects');
+        ->toContain('>Upcoming</button>')
+        ->toContain('>Ongoing</button>')
+        ->toContain('>Completed</button>')
+        ->toContain('No ongoing project profiles are currently published.')
+        ->toContain('Completed project profiles are not yet published.');
 });
 
 it('renders only approved testimonials with confirmed publication permission', function () {

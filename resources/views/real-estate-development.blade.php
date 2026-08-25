@@ -1,15 +1,27 @@
 @extends('layouts.site')
 
 @section('content')
-    <x-site.page-hero eyebrow="Real Estate Development" heading="Explore property opportunities with the facts in view." intro="Review Selotemna’s published land and development opportunities, understand the available information and choose an appropriate inspection or enquiry pathway." :breadcrumbs="[['label' => 'Home', 'href' => route('home')], ['label' => 'Real Estate Development']]" />
+    <x-site.page-hero
+        variant="overlay"
+        heading="Real Estate Development"
+        intro="Explore Selotemna’s development work and current property opportunities."
+        :background-image="$heroImage"
+        image-position="50% 50%"
+        :show-breadcrumbs="false"
+        :show-eyebrow="false"
+        alignment="center"
+        overlay-size="compact"
+    />
 
-    <section class="section-space bg-white">
-        <div class="site-container grid gap-12 lg:grid-cols-2 lg:gap-20">
-            <x-site.section-heading eyebrow="Division overview" heading="A clear pathway into Selotemna’s published opportunities." intro="Real Estate Development brings together Selotemna’s land, property and development opportunities. Omu Creek is currently the only published project and is classified as Upcoming." />
-            <div>
+    <section class="section-space bg-white" data-development-introduction>
+        <div class="site-container grid items-start gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
+            <x-site.section-heading eyebrow="Our development work" heading="Development opportunities presented with the facts in view." intro="Selotemna has undertaken previous real estate development projects. Omu Creek is the latest project and the current opportunity with detailed public information available." />
+            <div class="border-t border-ink-200 pt-8 lg:border-l lg:border-t-0 lg:pl-12 lg:pt-0" data-reveal>
                 <h2 class="text-2xl font-semibold">What you can review</h2>
-                <ul class="mt-6 grid gap-3 text-lg text-ink-500 sm:grid-cols-2">
-                    <li class="feature-line">Published land opportunities</li><li class="feature-line">Current prices and plot sizes</li><li class="feature-line">Available documentation details</li><li class="feature-line">Inspection request pathways</li>
+                <ul class="mt-6 border-y border-ink-200 text-lg text-ink-500" data-reveal-group>
+                    @foreach (['Published project information', 'Current plot sizes and outright prices', 'Title and documentation information', 'Inspection and enquiry options'] as $item)
+                        <li class="border-b border-ink-200 py-4 leading-7 last:border-b-0" data-reveal>{{ $item }}</li>
+                    @endforeach
                 </ul>
             </div>
         </div>
@@ -17,25 +29,16 @@
 
     <x-site.omu-creek-summary :property="$featuredProperty" :contact="$contact" />
 
-    <section class="section-space bg-white">
-        <div class="site-container">
-            <x-site.section-heading eyebrow="Evaluate the opportunity" heading="Move from interest to an informed next step." intro="Use the published information to understand the opportunity, then contact Selotemna for current availability or request an inspection." />
-            <div class="mt-10 grid gap-6 md:grid-cols-3" data-reveal-group>
-                <div class="plain-panel" data-reveal><h3>1. Review the details</h3><p>Read the title, plot, pricing, payment, documentation and allocation information currently published.</p></div>
-                <div class="plain-panel" data-reveal><h3>2. Confirm availability</h3><p>Contact Selotemna because property information and availability remain subject to confirmation.</p></div>
-                <div class="plain-panel" data-reveal><h3>3. Request an inspection</h3><p>Share your preferred date and contact details, then wait for a representative to confirm the next step.</p></div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section-space bg-ink-50">
-        <div class="site-container">
-            <x-site.section-heading eyebrow="Enquiries and inspections" heading="A request first, followed by confirmation." intro="Share Omu Creek as your opportunity of interest, your preferred date and your contact details. A Selotemna representative will follow up; the submission itself does not confirm an appointment." />
-            <div class="mt-8"><x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}">Request an Inspection</x-site.button></div>
-        </div>
-    </section>
-
     <x-site.testimonial-section :items="$testimonials" eyebrow="Real Estate Development experiences" heading="Feedback relevant to property decisions." />
 
-    <x-site.conversion-cta heading="Continue with Omu Creek or a direct enquiry." intro="Review the complete opportunity, request an inspection, or contact Selotemna about a Real Estate Development requirement." secondary-label="View Omu Creek" :secondary-href="route('omu-creek')" />
+    <x-site.conversion-cta
+        heading="Interested in Omu Creek?"
+        intro="Review the complete project information or request an inspection with your preferred date and contact details."
+        primary-label="Request an Inspection"
+        :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])"
+        secondary-label="View Full Project Details"
+        :secondary-href="route('omu-creek')"
+    >
+        <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
+    </x-site.conversion-cta>
 @endsection

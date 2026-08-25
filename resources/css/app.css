@@ -127,8 +127,18 @@
     }
 
     .text-link:hover svg,
-    .text-link:hover > span[aria-hidden='true'] {
+    .text-link:hover > span[aria-hidden='true'],
+    .text-link:focus-visible svg,
+    .text-link:focus-visible > span[aria-hidden='true'] {
         transform: translateX(3px);
+    }
+
+    .division-pathway-numbered {
+        transition: background-color var(--motion-fast) var(--motion-ease-standard);
+    }
+
+    .division-pathway-numbered:focus-within {
+        @apply bg-brand-50;
     }
 
     .nav-link {
@@ -250,9 +260,9 @@
     .project-tab::after {
         content: '';
         position: absolute;
-        right: 1.25rem;
+        right: 0;
         bottom: -1px;
-        left: 1.25rem;
+        left: 0;
         height: 3px;
         transform: scaleX(0);
         background: var(--color-brand-700);
@@ -260,7 +270,7 @@
     }
 
     .project-tab[aria-selected='true'] {
-        @apply bg-brand-50 text-brand-700;
+        @apply text-brand-700;
     }
 
     .project-tab[aria-selected='true']::after {
@@ -366,12 +376,20 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-    [data-project-card]:hover {
+    .division-pathway-numbered:hover {
+        @apply bg-brand-50;
+    }
+
+    .project-tab:hover {
+        @apply text-brand-700;
+    }
+
+    [data-project-card]:not([data-project-featured]):hover {
         transform: translateY(-3px);
         box-shadow: 0 16px 34px rgb(10 10 11 / 8%);
     }
 
-    [data-project-card]:hover img {
+    [data-project-card]:not([data-project-featured]):hover img {
         transform: scale(1.02);
     }
 }

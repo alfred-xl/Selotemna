@@ -7,7 +7,7 @@
                 <a href="{{ route('home') }}" class="inline-flex rounded-xl bg-white p-3" aria-label="Selotemna home">
                     <img src="{{ asset('assets/logo.png') }}" alt="Selotemna, RC 7361086" class="w-24" width="189" height="153" loading="lazy">
                 </a>
-                <p class="mt-6 leading-7 text-white/70">Explore property opportunities or begin an engineering and construction enquiry through Selotemna’s two public divisions.</p>
+                <p class="mt-6 leading-7 text-white/70">Explore Selotemna’s development opportunities or begin an engineering or construction enquiry.</p>
                 <p class="mt-4 text-sm font-semibold text-brand-100">RC 7361086</p>
             </div>
 
@@ -22,7 +22,7 @@
             </div>
 
             <div>
-                <h2 class="!text-sm font-semibold uppercase tracking-[0.14em] !text-white">Divisions &amp; opportunities</h2>
+                <h2 class="!text-sm font-semibold uppercase tracking-[0.14em] !text-white">Services &amp; projects</h2>
                 <ul class="mt-5 space-y-1 text-white/70">
                     <li><a href="{{ route('real-estate-development') }}" class="footer-link">Real Estate Development</a></li>
                     <li><a href="{{ route('omu-creek') }}" class="footer-link">Omu Creek</a></li>

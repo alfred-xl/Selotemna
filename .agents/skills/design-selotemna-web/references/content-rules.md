@@ -58,11 +58,13 @@ Use only these public status labels:
 - Completed Projects
 - Upcoming Projects
 
-Apply a status only when confirmed. Do not classify Omu Creek until its status is supplied.
+Apply a status only when confirmed. Omu Creek is classified as an Upcoming Project.
+
+Selotemna has undertaken previous projects. Omu Creek is its latest project and the current project with detailed public information in the repository. Never describe Omu Creek as Selotemna’s first, sole, or only project. Do not invent names, locations, images, statistics or details for previous projects.
 
 ## Demo content
 
-Temporary project data may be used only for development and layout testing. It must be removed in production through the application environment and clearly identified as layout content in development.
+The public catalogue contains no demo project records. Temporary project data may be used only for isolated development and layout testing. It must be disabled by default in production and clearly identified as layout content in development.
 
 Never present temporary content as verified Selotemna work. Exclude it from public metadata, SEO, structured data, sitemaps, analytics, statistics, case studies, and proof claims.
 

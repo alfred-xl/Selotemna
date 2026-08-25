@@ -34,25 +34,35 @@ Navigation includes Home, About, an accessible Divisions menu, Projects, FAQ, Co
 
 The hero identifies Selotemna and introduces the relationship between its two divisions without five-equal-service messaging.
 
-Use one H1, a short supporting statement, and two primary actions: Book an Inspection and Explore Projects.
+Use the H1 `Developing places. Building with purpose.`, a short supporting statement, and the actions Request an Inspection and Explore Omu Creek.
 
 ## Division pathways
 
-Show two primary pathways only:
+Show two primary pathways only. Use the approved asymmetric editorial layout: an approximately 38% left column for the eyebrow, heading, and introduction, and an approximately 62% right column for two stacked pathways. Use restrained `01` and `02` markers, thin dividers instead of card containers, subtle `brand-50` hover and focus feedback, restrained arrow movement, and a clean mobile stack.
+
+Eyebrow: `What we do`
+
+Heading: `Explore our developments. Discuss your next project.`
+
+Introduction: `Selotemna operates through Real Estate Development and Engineering & Construction, giving visitors a clear way to explore our development work, review current opportunities or begin a project conversation.`
 
 ### Real Estate Development
 
-Summarise land, property, and development opportunities. Route detailed content to the Real Estate Development page.
+Use: `Explore Selotemna’s real-estate developments and property opportunities. Omu Creek, our latest project, is the current featured opportunity for buyers and investors to review before making an enquiry or requesting an inspection.`
+
+CTA: `Explore Real Estate Development`
 
 ### Engineering & Construction
 
-Summarise engineering and construction capability. Route detailed content to the Engineering & Construction page.
+Use: `Bring an engineering or construction requirement to Selotemna. Share the site, scope and current stage so the team can understand the project and identify the appropriate next step.`
+
+CTA: `Explore Engineering & Construction`
 
 Property Management must not appear as an equal division. If retained, treat it as a supporting service and do not finalise its homepage placement until confirmed.
 
 ## Omu Creek
 
-Present Omu Creek as a verified featured land opportunity under Real Estate Development.
+Present Omu Creek as Selotemna’s latest project and verified featured land opportunity under Real Estate Development. Selotemna has undertaken previous projects; never describe Omu Creek as its first or only project, and do not invent historical project records.
 
 Preserve exactly:
 
@@ -65,13 +75,13 @@ Preserve exactly:
 - Prices exclude applicable taxes.
 - Availability and property information are subject to confirmation.
 
-Do not assign Omu Creek an ongoing, completed, or upcoming status until confirmed.
+Omu Creek is classified as an Upcoming Project. Continue to keep current availability subject to confirmation.
 
 Continue to reserve media space safely, format prices consistently, identify the inspection interest, and treat the CTA as a request rather than confirmation.
 
 ## Projects overview
 
-Projects are a core website destination. The homepage should show only a concise preview and route visitors to the Projects page.
+Projects are a core website destination. The homepage should show only a concise preview and route visitors to the Projects page. Omu Creek may be the current project with detailed public information in the repository, but that publishing boundary must remain distinct from Selotemna’s wider project history.
 
 The Projects page supports three categories:
 
@@ -81,7 +91,7 @@ The Projects page supports three categories:
 
 Category labels are factual statuses, not decorative filters. Show a status only when verified.
 
-Temporary project records are permitted for development and layout testing only. They are automatically removed in production, clearly identified in development, excluded from SEO and structured data, and never presented as verified Selotemna work.
+The public catalogue contains no temporary project records. Demo records are permitted only in isolated development and layout testing, must be disabled by default in production, excluded from SEO and structured data, and never presented as verified Selotemna work.
 
 ## About summary
 

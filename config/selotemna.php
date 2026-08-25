@@ -162,15 +162,15 @@ return [
 
     'projects' => [
         'ongoing' => [
-            'label' => 'Ongoing Projects',
+            'label' => 'Ongoing',
             'items' => [],
         ],
         'completed' => [
-            'label' => 'Completed Projects',
+            'label' => 'Completed',
             'items' => [],
         ],
         'upcoming' => [
-            'label' => 'Upcoming Projects',
+            'label' => 'Upcoming',
             'items' => [
                 [
                     'slug' => 'omu-creek',

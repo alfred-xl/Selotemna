@@ -11,10 +11,14 @@ class ProjectController extends Controller
 
     public function index(): View
     {
+        $featuredProperty = $this->content->featuredProperty();
+        $media = $this->content->siteMedia();
+
         return view('projects.index', [
             'title' => 'Projects | Selotemna',
-            'description' => 'Explore Omu Creek, Selotemna’s sole published project, classified as an Upcoming Project under Real Estate Development.',
-            'projectGroups' => $this->content->projectGroups(),
+            'description' => 'Explore Selotemna projects by stage, including Omu Creek, the company’s latest project and current opportunity with detailed public information.',
+            'heroImage' => $featuredProperty['short_video_poster'] ?? $media['development_aerial'] ?? null,
+            'projectGroups' => $this->content->projectGroups(includeEmptyGroups: true),
             'contact' => $this->content->contactDetails(),
         ]);
     }

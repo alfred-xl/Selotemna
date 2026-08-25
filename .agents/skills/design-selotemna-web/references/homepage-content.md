@@ -35,27 +35,41 @@ The hero identifies Selotemna and expresses the relationship between Real Estate
 
 Eyebrow: `Real Estate Development · Engineering & Construction`
 
-H1: `Developing real estate. Delivering engineered solutions.`
+H1: `Developing places. Building with purpose.`
 
-Primary CTA: Book an Inspection
+Primary CTA: Request an Inspection
 
-Secondary CTA: Explore Projects
+Secondary CTA: Explore Omu Creek
 
 ## Division pathways
 
-### Real Estate Development
+Use an asymmetric editorial layout: approximately 38% for the section eyebrow, heading, and introduction; approximately 62% for two stacked division pathways separated by thin rules. Use restrained `01` and `02` markers, subtle `brand-50` hover and focus feedback, and a clean mobile stack.
 
-Introduce Selotemna’s land, property, and development opportunities. Route detailed inventory and opportunity content to the Real Estate Development page.
+Eyebrow: `What we do`
 
-### Engineering & Construction
+Heading: `Explore our developments. Discuss your next project.`
 
-Introduce Selotemna’s engineering and construction capability. Route detailed scope, enquiries, and verified work to the Engineering & Construction page.
+Introduction: `Selotemna operates through Real Estate Development and Engineering & Construction, giving visitors a clear way to explore our development work, review current opportunities or begin a project conversation.`
+
+### 01 — Real Estate Development
+
+`Explore Selotemna’s real-estate developments and property opportunities. Omu Creek, our latest project, is the current featured opportunity for buyers and investors to review before making an enquiry or requesting an inspection.`
+
+CTA: `Explore Real Estate Development`
+
+### 02 — Engineering & Construction
+
+`Bring an engineering or construction requirement to Selotemna. Share the site, scope and current stage so the team can understand the project and identify the appropriate next step.`
+
+CTA: `Explore Engineering & Construction`
 
 ### Property Management
 
 Do not present Property Management as a third primary division. It may appear later as a supporting service after its scope and placement are confirmed.
 
 ## Projects overview
+
+Selotemna has undertaken previous projects. Omu Creek is its latest project and the current project with detailed public information in the repository. This content boundary must not be described as the company having only one project, and previous project names, locations, images, statistics or details must not be invented.
 
 The homepage includes a concise Projects preview linking to the Projects page. The project architecture supports:
 
@@ -65,11 +79,11 @@ The homepage includes a concise Projects preview linking to the Projects page. T
 
 Only show a category when appropriate content exists. Do not assign a status without verification.
 
-Temporary project content may be used for development and layout testing only. It is identified as layout content outside production, automatically removed in production, and never presented as verified Selotemna work.
+The public project catalogue contains no demo records. Demo project content may be used only in an isolated development and layout-testing context, must be disabled by default in production, and must never be presented as verified Selotemna work.
 
 ## Omu Creek
 
-Omu Creek remains the verified featured land opportunity under Real Estate Development.
+Omu Creek remains the verified featured land opportunity under Real Estate Development and is Selotemna’s latest project. Do not describe it as the company’s first or only project.
 
 Preserve these facts exactly:
 
@@ -82,7 +96,7 @@ Preserve these facts exactly:
 - Prices exclude applicable taxes.
 - Availability and property information are subject to confirmation.
 
-Do not classify Omu Creek as ongoing, completed, or upcoming until its status is confirmed.
+Omu Creek is classified as an Upcoming Project. This status does not override the availability disclaimer.
 
 The approved FAQ source verifies additional Omu Creek information. Use references/faq-content.md for its current location, title claims, payment terms, charges, documentation, infrastructure, allocation, construction, default, resale, and refund wording. Do not infer beyond that source.
 
@@ -126,10 +140,9 @@ Do not add project status, location, structured data, or proof that has not been
 ## Content still required
 
 - Division summaries and verified service scope
-- Verified projects and their confirmed statuses
+- Approved records for Selotemna’s previous projects and their confirmed statuses
 - Project-detail content model
-- Omu Creek project status
-- Actual Omu Creek video and poster
+- Omu Creek video posters
 - Captions or transcript if video contains speech
 - Verified contact details
 - Property Management scope and placement

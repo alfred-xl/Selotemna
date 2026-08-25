@@ -33,11 +33,13 @@ For a verified land opportunity, prioritise:
 
 Use tabular figures and separated rows. On mobile, place media first and keep prices free from horizontal overflow.
 
-Omu Creek remains unclassified by project status until confirmed.
+Omu Creek is Selotemna’s latest project and is classified as an Upcoming Project. The status does not replace the requirement to confirm current availability.
 
 ## Projects discovery
 
 Projects are a central public content type. The Projects page supports Ongoing Projects, Completed Projects, and Upcoming Projects. Only verified records may be published in production.
+
+Selotemna has undertaken previous projects, while Omu Creek is its latest project and the current project with detailed public information in the repository. Do not turn the absence of approved historical records into an “only project” claim, and do not invent names, locations, images, statistics or details for previous work.
 
 Do not infer status from photography, marketing language, dates, or perceived completion. A project status must come from approved content.
 
@@ -52,15 +54,15 @@ A project preview should contain only verified fields such as:
 - detail URL;
 - relevant enquiry or inspection action.
 
-A future generic Project Detail page should provide the approved overview, scope or opportunity information, media, status, documentation where relevant, and next action without unsupported claims. Omu Creek currently uses its own verified detail route and remains unclassified by project status.
+A future generic Project Detail page should provide the approved overview, scope or opportunity information, media, status, documentation where relevant, and next action without unsupported claims. Omu Creek currently uses its own verified detail route and is classified as an Upcoming Project.
 
 ## Demo project data
 
-Demo data is allowed only for local development, component testing, and layout validation.
+The public project catalogue currently contains no demo records. Demo data is allowed only for isolated local development, component testing, and layout validation.
 
 Requirements:
 
-- remove temporary records in production using the application environment;
+- keep temporary records disabled by default in production;
 - mark them clearly as demo data in development;
 - keep them out of SEO, structured data, sitemaps, analytics, and public proof;
 - do not use real-looking claims that could be confused with verified work;

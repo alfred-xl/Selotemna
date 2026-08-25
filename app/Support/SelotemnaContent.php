@@ -83,7 +83,7 @@ final class SelotemnaContent
     }
 
     /** @return array<string, array<string, mixed>> */
-    public function projectGroups(?string $division = null): array
+    public function projectGroups(?string $division = null, bool $includeEmptyGroups = false): array
     {
         $groups = config('selotemna.projects', []);
         $featuredProperty = $this->featuredProperty();
@@ -110,7 +110,21 @@ final class SelotemnaContent
             return $group;
         }, $groups);
 
-        return array_filter($groups, fn (array $group): bool => $group['items'] !== []);
+        if (! $includeEmptyGroups) {
+            return array_filter($groups, fn (array $group): bool => $group['items'] !== []);
+        }
+
+        $stageLabels = [
+            'upcoming' => 'Upcoming',
+            'ongoing' => 'Ongoing',
+            'completed' => 'Completed',
+        ];
+
+        return collect($stageLabels)
+            ->mapWithKeys(fn (string $label, string $stage): array => [
+                $stage => $groups[$stage] ?? ['label' => $label, 'items' => []],
+            ])
+            ->all();
     }
 
     /** @return array<int, array<string, mixed>> */
