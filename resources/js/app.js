@@ -378,6 +378,7 @@ document.querySelectorAll('[data-project-tabs]').forEach((tabGroup) => {
 document.querySelectorAll('[data-faq-group]').forEach((group) => {
     const triggers = [...group.querySelectorAll('[data-faq-trigger]')];
     const panelAnimations = new WeakMap();
+    const singleOpen = group.dataset.faqSingleOpen !== 'false';
 
     const stopPanelAnimation = (panel) => {
         panelAnimations.get(panel)?.cancel();
@@ -442,10 +443,12 @@ document.querySelectorAll('[data-faq-group]').forEach((group) => {
         trigger.addEventListener('click', () => {
             const willOpen = trigger.getAttribute('aria-expanded') !== 'true';
 
-            triggers.forEach((otherTrigger) => {
-                if (otherTrigger === trigger) return;
-                closeItem(otherTrigger, document.getElementById(otherTrigger.getAttribute('aria-controls')));
-            });
+            if (singleOpen && willOpen) {
+                triggers.forEach((otherTrigger) => {
+                    if (otherTrigger === trigger) return;
+                    closeItem(otherTrigger, document.getElementById(otherTrigger.getAttribute('aria-controls')));
+                });
+            }
 
             if (willOpen) openItem(trigger, panel);
             else closeItem(trigger, panel);
@@ -453,6 +456,44 @@ document.querySelectorAll('[data-faq-group]').forEach((group) => {
     });
 
     group.setAttribute('data-faq-enhanced', 'true');
+});
+
+document.querySelectorAll('[data-faq-category-nav]').forEach((navigation) => {
+    const links = [...navigation.querySelectorAll('[data-faq-category-link]')];
+    const sections = links
+        .map((link) => document.querySelector(link.hash))
+        .filter((section) => section instanceof HTMLElement);
+
+    if (links.length === 0 || sections.length === 0) return;
+
+    const setActiveCategory = (sectionId) => {
+        links.forEach((link) => {
+            if (link.hash === `#${sectionId}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+        });
+    };
+
+    links.forEach((link) => {
+        link.addEventListener('click', () => setActiveCategory(link.hash.slice(1)));
+    });
+
+    const hashTarget = sections.find((section) => `#${section.id}` === window.location.hash);
+    if (hashTarget) setActiveCategory(hashTarget.id);
+
+    if (!('IntersectionObserver' in window)) return;
+
+    const categoryObserver = new IntersectionObserver(
+        (entries) => {
+            const visibleSection = entries
+                .filter((entry) => entry.isIntersecting)
+                .sort((first, second) => first.boundingClientRect.top - second.boundingClientRect.top)[0];
+
+            if (visibleSection) setActiveCategory(visibleSection.target.id);
+        },
+        { rootMargin: '-18% 0px -68% 0px', threshold: [0, 0.1] },
+    );
+
+    sections.forEach((section) => categoryObserver.observe(section));
 });
 
 reducedMotion.addEventListener('change', (event) => {
@@ -466,15 +507,65 @@ reducedMotion.addEventListener('change', (event) => {
 document.querySelector('[data-form-error-summary]')?.focus();
 
 document.querySelectorAll('[data-submit-once]').forEach((form) => {
+    const contactMethod = form.querySelector('[data-contact-method]');
+    const conditionalContactFields = [...form.querySelectorAll('[data-conditional-contact]')];
+
+    const updateConditionalContactFields = () => {
+        const selectedMethod = contactMethod?.value;
+
+        conditionalContactFields.forEach((field) => {
+            const method = field.dataset.conditionalContact;
+            const isRequired = selectedMethod === method;
+            const requirement = form.querySelector(`[data-contact-requirement][data-method="${method}"]`);
+
+            field.required = isRequired;
+            field.setAttribute('aria-required', isRequired ? 'true' : 'false');
+
+            if (requirement) {
+                requirement.textContent = isRequired
+                    ? '(required for your selected contact method)'
+                    : `(required when ${method} is selected)`;
+            }
+        });
+    };
+
+    contactMethod?.addEventListener('change', updateConditionalContactFields);
+    updateConditionalContactFields();
+
+    const enquiryType = form.querySelector('[data-enquiry-type]');
+    const engineeringFields = form.querySelector('[data-engineering-fields]');
+    const engineeringInputs = [...(engineeringFields?.querySelectorAll('[data-engineering-input]') ?? [])];
+
+    const updateEngineeringFields = () => {
+        if (!engineeringFields) return;
+
+        const isEngineeringEnquiry = enquiryType?.value === 'Engineering & Construction';
+
+        engineeringFields.hidden = !isEngineeringEnquiry;
+        engineeringFields.setAttribute('aria-hidden', isEngineeringEnquiry ? 'false' : 'true');
+        engineeringInputs.forEach((input) => {
+            input.disabled = !isEngineeringEnquiry;
+        });
+    };
+
+    enquiryType?.addEventListener('change', updateEngineeringFields);
+    updateEngineeringFields();
+
     form.addEventListener('submit', () => {
         const button = form.querySelector('[data-submit-button]');
         const label = button?.querySelector('[data-submit-label]');
+        const status = form.querySelector('[data-submit-status]');
 
         if (!button || button.disabled) return;
 
+        form.setAttribute('aria-busy', 'true');
         button.disabled = true;
         button.setAttribute('aria-disabled', 'true');
+        button.setAttribute('aria-busy', 'true');
 
-        if (label && button.dataset.pendingLabel) label.textContent = button.dataset.pendingLabel;
+        if (label && button.dataset.pendingLabel) {
+            label.textContent = button.dataset.pendingLabel;
+            if (status) status.textContent = button.dataset.pendingLabel;
+        }
     });
 });

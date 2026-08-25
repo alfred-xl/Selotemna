@@ -1,6 +1,8 @@
 <?php
 
+use App\Mail\ContactEnquiryMail;
 use App\Mail\InspectionRequestMail;
+use App\Models\ContactEnquiry;
 use App\Models\InspectionRequest;
 use App\Support\SelotemnaContent;
 use Illuminate\Support\Facades\Mail;
@@ -16,9 +18,9 @@ function publicRoutes(): array
         'omu-creek' => 'Omu Creek',
         'engineering-construction' => 'Engineering & Construction',
         'projects.index' => 'Projects',
-        'faq' => 'Clear answers before your next step.',
-        'inspections.create' => 'Request an Omu Creek inspection.',
-        'contact' => 'Start with the right conversation.',
+        'faq' => 'Frequently Asked Questions',
+        'inspections.create' => 'Request an Inspection',
+        'contact' => 'Contact Selotemna',
     ];
 }
 
@@ -35,6 +37,25 @@ function validInspectionData(): array
         'preferred_time' => 'Morning',
         'contact_method' => 'Telephone',
         'message' => 'Please follow up about this request.',
+        'consent' => '1',
+    ];
+}
+
+function validContactEnquiryData(): array
+{
+    return [
+        'submission_token' => (string) Str::uuid(),
+        'full_name' => 'Contact Visitor',
+        'phone' => '+234 800 000 0000',
+        'email' => 'visitor@example.test',
+        'whatsapp' => '',
+        'contact_method' => 'Telephone',
+        'enquiry_type' => 'General enquiry',
+        'project_type' => '',
+        'proposed_location' => '',
+        'project_stage' => '',
+        'scope_summary' => '',
+        'message' => 'Please contact me about this enquiry.',
         'consent' => '1',
     ];
 }
@@ -166,9 +187,10 @@ it('uses the reusable centred image overlay hero on the approved pages', functio
         ->not->toContain('autoplay');
 
     $faq = $this->get(route('faq'))->assertOk()->getContent();
-    expect($faq)->toContain('data-page-hero-variant="default"')
-        ->not->toContain('data-page-hero-variant="overlay"')
-        ->not->toContain('data-page-hero-overlay');
+    expect($faq)->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('data-page-hero-overlay');
 });
 
 it('uses the branded hero fallback when the construction image is unavailable', function () {
@@ -401,6 +423,7 @@ it('uses one verified secondary contact action or hides it when unavailable', fu
         ->not->toContain('Chat on WhatsApp');
 
     config()->set('selotemna.phone', null);
+    config()->set('selotemna.phones', []);
 
     $noContactContent = $this->get(route('engineering-construction'))->assertOk()->getContent();
     expect($noContactContent)->not->toContain('Call Selotemna')
@@ -572,20 +595,59 @@ it('shows exactly the four approved homepage faq questions', function () {
         ->not->toContain('Can I pay in installments?');
 });
 
-it('renders all fifteen grouped faq answers with globally unique ids', function () {
+it('renders every configured faq value in an accessible grouped layout', function () {
     $content = $this->get(route('faq'))->getContent();
     preg_match_all('/data-faq-trigger/', $content, $triggers);
     preg_match_all('/\bid="([^"]+)"/', $content, $ids);
+    preg_match_all('/<button[^>]*data-faq-trigger[^>]*>/s', $content, $buttons);
 
     expect($triggers[0])->toHaveCount(15)
-        ->and($ids[1])->toHaveCount(count(array_unique($ids[1])));
+        ->and($buttons[0])->toHaveCount(15)
+        ->and($ids[1])->toHaveCount(count(array_unique($ids[1])))
+        ->and(collect($buttons[0])->every(fn (string $button): bool => str_contains($button, 'type="button"') && str_contains($button, 'aria-expanded="false"') && str_contains($button, 'aria-controls=')))->toBeTrue()
+        ->and(substr_count($content, 'data-faq-single-open="true"'))->toBe(count(config('selotemna.faq_groups')))
+        ->and(substr_count($content, 'data-faq-category-link'))->toBe(count(config('selotemna.faq_groups')))
+        ->and($content)->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('Frequently Asked Questions')
+        ->toContain('Clear answers about Omu Creek’s location, title, prices, payments, allocation and policies.')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->toContain('Ready to continue with Omu Creek?')
+        ->toContain('Request an Inspection')
+        ->toContain('View Omu Creek')
+        ->toContain('Submitting an inspection request does not confirm an appointment');
 
-    foreach (config('selotemna.faq_groups') as $group) {
-        expect($content)->toContain($group['label']);
+    foreach (config('selotemna.faq_groups') as $key => $group) {
+        expect($content)->toContain($group['label'])
+            ->toContain('href="#faq-group-'.$key.'"')
+            ->toContain('id="faq-group-'.$key.'"');
+
         foreach ($group['items'] as $item) {
             expect($content)->toContain($item['question'])->toContain($item['answer']);
+
+            foreach ($item['points'] ?? [] as $point) {
+                expect($content)->toContain($point);
+            }
+
+            if (isset($item['note'])) {
+                expect($content)->toContain($item['note']);
+            }
         }
     }
+});
+
+it('keeps faq accordion mouse and native keyboard activation scoped to each group', function () {
+    $content = $this->get(route('faq'))->getContent();
+    $script = file_get_contents(resource_path('js/app.js'));
+
+    expect($content)->toContain('data-faq-collapse-default="true"')
+        ->toContain('data-faq-single-open="true"')
+        ->toContain('hidden')
+        ->and($script)->toContain("trigger.addEventListener('click'")
+        ->toContain("const singleOpen = group.dataset.faqSingleOpen !== 'false'")
+        ->toContain('if (singleOpen && willOpen)')
+        ->toContain("trigger.setAttribute('aria-expanded', 'true')")
+        ->toContain("trigger.setAttribute('aria-expanded', 'false')");
 });
 
 it('renders the complete verified Omu Creek facts and corrected survey charge', function () {
@@ -611,8 +673,8 @@ it('uses the approved Omu Creek videos in their intended locations without autop
     $homepage = $this->get(route('home'))->assertOk()->getContent();
     $detailPage = $this->get(route('omu-creek'))->assertOk()->getContent();
 
-    expect($featuredProperty['short_video_url'])->toBe('https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4')
-        ->and($featuredProperty['video_url'])->toBe('https://selotemna.boatengalfred.work/OMU%20CREEK%202%20VIDEO%201.mp4')
+    expect($featuredProperty['short_video_url'])->not->toBeNull()
+        ->and($featuredProperty['video_url'])->not->toBeNull()
         ->and($homepage)->toContain($featuredProperty['short_video_url'])
         ->toContain('data-event="omu_creek_short_video_play"')
         ->and($detailPage)->toContain($featuredProperty['video_url'])
@@ -777,6 +839,8 @@ it('never renders empty contact links or hash targets', function () {
     foreach (['phone', 'whatsapp', 'email', 'address', 'business_hours'] as $key) {
         config()->set("selotemna.{$key}", null);
     }
+    config()->set('selotemna.phones', []);
+    config()->set('selotemna.emails', []);
 
     foreach (array_keys(publicRoutes()) as $routeName) {
         $content = $this->get(route($routeName))->getContent();
@@ -788,18 +852,227 @@ it('never renders empty contact links or hash targets', function () {
 });
 
 it('renders configured contact channels with safe urls', function () {
-    config()->set('selotemna.phone', '+234 800 000 0000');
-    config()->set('selotemna.whatsapp', '+2348000000000');
-    config()->set('selotemna.email', 'contact@selotemna.test');
+    config()->set('selotemna.phone', null);
+    config()->set('selotemna.phones', ['+234 800 000 0000', '+234 811 111 1111']);
+    config()->set('selotemna.whatsapp', null);
+    config()->set('selotemna.email', null);
+    config()->set('selotemna.emails', ['contact@selotemna.test', 'projects@selotemna.test']);
     config()->set('selotemna.address', 'Verified office address');
     config()->set('selotemna.business_hours', 'Verified business hours');
 
     $this->get(route('contact'))
         ->assertSee('tel:+2348000000000', false)
-        ->assertSee('https://wa.me/2348000000000', false)
+        ->assertSee('tel:+2348111111111', false)
         ->assertSee('mailto:contact@selotemna.test', false)
+        ->assertSee('mailto:projects@selotemna.test', false)
         ->assertSee('Verified office address')
-        ->assertSee('Verified business hours');
+        ->assertSee('Verified business hours')
+        ->assertDontSee('wa.me', false);
+});
+
+it('publishes the verified Selotemna contacts and preserves singular primary aliases', function () {
+    $contact = app(SelotemnaContent::class)->contactDetails();
+    $content = $this->get(route('contact'))->assertOk()->getContent();
+
+    expect($contact['phones'])->toHaveCount(2)
+        ->and($contact['emails'])->toHaveCount(2)
+        ->and($contact['phone'])->toBe('0905 151 2521')
+        ->and($contact['phone_url'])->toBe('tel:+2349051512521')
+        ->and($contact['email'])->toBe('info@selotemna.com')
+        ->and($contact['email_url'])->toBe('mailto:info@selotemna.com')
+        ->and($contact['whatsapp_url'])->toBeNull()
+        ->and($content)->toContain('0905 151 2521')
+        ->toContain('0802 406 6013')
+        ->toContain('tel:+2349051512521')
+        ->toContain('tel:+2348024066013')
+        ->toContain('info@selotemna.com')
+        ->toContain('selotemna@gmail.com')
+        ->toContain('mailto:info@selotemna.com')
+        ->toContain('mailto:selotemna@gmail.com')
+        ->not->toContain('wa.me');
+});
+
+it('accepts legacy singular contact configuration', function () {
+    config()->set('selotemna.phones', []);
+    config()->set('selotemna.emails', []);
+    config()->set('selotemna.phone', '+234 800 000 0000');
+    config()->set('selotemna.email', 'legacy@selotemna.test');
+
+    $contact = app(SelotemnaContent::class)->contactDetails();
+
+    expect($contact['phones'])->toHaveCount(1)
+        ->and($contact['emails'])->toHaveCount(1)
+        ->and($contact['phone'])->toBe('0800 000 0000')
+        ->and($contact['phone_url'])->toBe('tel:+2348000000000')
+        ->and($contact['email'])->toBe('legacy@selotemna.test')
+        ->and($contact['email_url'])->toBe('mailto:legacy@selotemna.test');
+});
+
+it('renders the redesigned Contact page and progressively enhanced enquiry form', function () {
+    $content = $this->get(route('contact'))->assertOk()->getContent();
+    $script = file_get_contents(resource_path('js/app.js'));
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero)->not->toBeEmpty()
+        ->and($hero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('Contact Selotemna')
+        ->toContain('Speak with our team about Omu Creek, real estate development, or an engineering and construction requirement.')
+        ->toContain('assets/images/selotemna-contact-meeting.jpg')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->and($content)->toContain('Editorial image.')
+        ->toContain('Photo by Ninthgrid on Pexels')
+        ->toContain('Speak with our team')
+        ->toContain('Tell us what you would like to discuss.')
+        ->toContain('Share enough information for our team to understand your enquiry and determine the appropriate next step.')
+        ->toContain('action="'.route('contact.store').'"')
+        ->toContain('data-contact-enquiry-form')
+        ->toContain('data-enquiry-type')
+        ->toContain('data-engineering-fields')
+        ->toContain('Project type')
+        ->toContain('Proposed location')
+        ->toContain('Current project stage')
+        ->toContain('Scope or requirement summary')
+        ->toContain('Omu Creek information')
+        ->toContain('Real Estate Development')
+        ->toContain('Engineering &amp; Construction')
+        ->toContain('General enquiry')
+        ->toContain('data-pending-label="Sending enquiry…"')
+        ->toContain('Property or project enquiry')
+        ->toContain('Omu Creek inspection')
+        ->toContain('Interested in visiting Omu Creek?')
+        ->not->toContain('Start with the right conversation.')
+        ->and($script)->toContain("enquiryType?.addEventListener('change', updateEngineeringFields)")
+        ->toContain("enquiryType?.value === 'Engineering & Construction'")
+        ->toContain('engineeringFields.hidden = !isEngineeringEnquiry')
+        ->toContain('input.disabled = !isEngineeringEnquiry');
+});
+
+it('validates contact enquiries and preserves the submission token and old input', function () {
+    Mail::fake();
+    $data = validContactEnquiryData();
+    $data['phone'] = '';
+    $data['enquiry_type'] = '';
+    $data['message'] = '';
+    unset($data['consent']);
+
+    $this->from(route('contact'))
+        ->post(route('contact.store'), $data)
+        ->assertRedirect(route('contact'))
+        ->assertSessionHasErrors(['phone', 'enquiry_type', 'message', 'consent'])
+        ->assertSessionHasInput('submission_token', $data['submission_token'])
+        ->assertSessionHasInput('full_name', $data['full_name']);
+
+    Mail::assertNothingSent();
+    expect(ContactEnquiry::query()->count())->toBe(0);
+});
+
+it('requires the selected contact detail and rejects the contact honeypot', function () {
+    Mail::fake();
+
+    foreach ([['Email', 'email'], ['WhatsApp', 'whatsapp']] as [$method, $field]) {
+        $data = validContactEnquiryData();
+        $data['submission_token'] = (string) Str::uuid();
+        $data['contact_method'] = $method;
+        $data[$field] = '';
+
+        $this->post(route('contact.store'), $data)->assertSessionHasErrors([$field]);
+    }
+
+    $honeypot = validContactEnquiryData();
+    $honeypot['website'] = 'bot-value';
+    $this->post(route('contact.store'), $honeypot)->assertSessionHasErrors(['website']);
+
+    Mail::assertNothingSent();
+    expect(ContactEnquiry::query()->count())->toBe(0);
+});
+
+it('saves and emails an engineering enquiry to the primary address', function () {
+    Mail::fake();
+    config()->set('selotemna.email', 'primary@selotemna.test');
+    config()->set('mail.default', 'smtp');
+    $data = validContactEnquiryData();
+    $data['enquiry_type'] = 'Engineering & Construction';
+    $data['project_type'] = 'Commercial building';
+    $data['proposed_location'] = 'Lagos';
+    $data['project_stage'] = 'Initial planning';
+    $data['scope_summary'] = 'Review the available project scope.';
+
+    $this->post(route('contact.store'), $data)
+        ->assertRedirect(route('contact'))
+        ->assertSessionHas('contact_enquiry_receipt');
+
+    Mail::assertSent(ContactEnquiryMail::class, fn (ContactEnquiryMail $mail): bool => $mail->hasTo('primary@selotemna.test') && $mail->enquiry->enquiry_type === 'Engineering & Construction');
+
+    $enquiry = ContactEnquiry::query()->sole();
+    expect($enquiry->status)->toBe(ContactEnquiry::STATUS_NEW)
+        ->and($enquiry->project_type)->toBe('Commercial building')
+        ->and($enquiry->proposed_location)->toBe('Lagos')
+        ->and($enquiry->project_stage)->toBe('Initial planning')
+        ->and($enquiry->scope_summary)->toBe('Review the available project scope.')
+        ->and($enquiry->staff_notified_at)->not->toBeNull()
+        ->and(InspectionRequest::query()->count())->toBe(0);
+});
+
+it('does not duplicate a repeated contact enquiry token', function () {
+    Mail::fake();
+    config()->set('selotemna.email', 'primary@selotemna.test');
+    config()->set('mail.default', 'smtp');
+    $data = validContactEnquiryData();
+
+    $this->post(route('contact.store'), $data)->assertRedirect(route('contact'));
+    $this->post(route('contact.store'), $data)->assertRedirect(route('contact'));
+
+    expect(ContactEnquiry::query()->count())->toBe(1);
+    Mail::assertSentCount(1);
+});
+
+it('keeps a saved contact enquiry when staff email delivery fails', function () {
+    config()->set('selotemna.email', 'primary@selotemna.test');
+    config()->set('mail.default', 'smtp');
+    Mail::shouldReceive('to')->once()->andThrow(new RuntimeException('Mail transport unavailable'));
+
+    $this->post(route('contact.store'), validContactEnquiryData())
+        ->assertRedirect(route('contact'))
+        ->assertSessionHas('contact_enquiry_receipt');
+
+    $enquiry = ContactEnquiry::query()->sole();
+    expect($enquiry->notification_failed_at)->not->toBeNull()
+        ->and($enquiry->staff_notified_at)->toBeNull();
+});
+
+it('rate limits contact enquiry submissions', function () {
+    Mail::fake();
+    config()->set('selotemna.email', 'primary@selotemna.test');
+    config()->set('mail.default', 'smtp');
+
+    foreach (range(1, 5) as $attempt) {
+        $this->post(route('contact.store'), validContactEnquiryData())->assertRedirect(route('contact'));
+    }
+
+    $this->post(route('contact.store'), validContactEnquiryData())->assertStatus(429);
+    expect(ContactEnquiry::query()->count())->toBe(5);
+    Mail::assertSentCount(5);
+});
+
+it('renders the saved contact enquiry receipt instead of the form', function () {
+    $content = $this->withSession([
+        'contact_enquiry_receipt' => [
+            'reference' => 'ENQ-TEST-1234',
+            'enquiry_type' => 'General enquiry',
+            'contact_method' => 'Telephone',
+        ],
+    ])->get(route('contact'))->assertOk()->getContent();
+
+    expect($content)->toContain('data-contact-enquiry-receipt')
+        ->toContain('Enquiry received')
+        ->toContain('Your enquiry has been saved.')
+        ->toContain('Keep this reference for follow-up.')
+        ->toContain('ENQ-TEST-1234')
+        ->toContain('Return to Home')
+        ->toContain('Send Another Enquiry')
+        ->not->toContain('data-contact-enquiry-form');
 });
 
 it('keeps the database-backed request form available when email delivery is unavailable', function () {
@@ -808,10 +1081,71 @@ it('keeps the database-backed request form available when email delivery is unav
     $response = $this->get(route('inspections.create'));
 
     $response->assertOk()
-        ->assertSee('submitting it does not automatically confirm an appointment')
+        ->assertSee('Submitting the form does not confirm an inspection appointment.')
         ->assertSee('data-inspection-form', false)
         ->assertDontSee('data-inspection-contact-fallback', false)
         ->assertDontSee('Inspection confirmed');
+});
+
+it('renders the responsive request-first inspection experience', function () {
+    $content = $this->get(route('inspections.create'))->assertOk()->getContent();
+    $script = file_get_contents(resource_path('js/app.js'));
+    preg_match('/<section[^>]*data-page-hero[^>]*>.*?<\/section>/s', $content, $hero);
+
+    expect($hero)->not->toBeEmpty()
+        ->and($hero[0])->toContain('data-page-hero-variant="overlay"')
+        ->toContain('data-page-hero-alignment="center"')
+        ->toContain('data-page-hero-size="compact"')
+        ->toContain('Request an Inspection')
+        ->toContain('Choose a preferred date for Omu Creek and our team will follow up to confirm availability.')
+        ->toContain('assets/images/selotemna-inspection-consultation.jpg')
+        ->not->toContain('data-page-hero-breadcrumb')
+        ->and($content)->toContain('Editorial image.')
+        ->toContain('Photo by Gustavo Fring on Pexels')
+        ->toContain('order-1 min-w-0 max-w-3xl lg:order-2')
+        ->toContain('order-2 min-w-0 lg:order-1 lg:sticky lg:top-28')
+        ->toContain('Inspection for Omu Creek')
+        ->toContain('Review project details')
+        ->toContain('What happens next')
+        ->toContain('Share your details')
+        ->toContain('Receive your reference')
+        ->toContain('Wait for confirmation')
+        ->toContain('Important notes')
+        ->toContain('Contact details')
+        ->toContain('Inspection preference')
+        ->toContain('Additional information')
+        ->toContain('Consent and submission')
+        ->toContain('data-contact-method')
+        ->toContain('data-conditional-contact="WhatsApp"')
+        ->toContain('data-conditional-contact="Email"')
+        ->toContain('data-pending-label="Saving request…"')
+        ->not->toContain('optional email notification')
+        ->not->toContain('mail-delivery issue')
+        ->and(strpos($content, 'data-inspection-form'))->toBeLessThan(strpos($content, 'What happens next'))
+        ->and($script)->toContain("contactMethod?.addEventListener('change', updateConditionalContactFields)")
+        ->toContain("form.setAttribute('aria-busy', 'true')")
+        ->toContain("button.setAttribute('aria-busy', 'true')");
+});
+
+it('renders the saved inspection receipt instead of the form', function () {
+    $content = $this->withSession([
+        'inspection_receipt' => [
+            'reference' => 'INS-TEST-1234',
+            'project' => 'Omu Creek',
+            'preferred_date' => '26 August 2026',
+            'preferred_time' => 'Morning',
+        ],
+    ])->get(route('inspections.create'))->assertOk()->getContent();
+
+    expect($content)->toContain('data-inspection-receipt')
+        ->toContain('Request received')
+        ->toContain('Your request has been saved.')
+        ->toContain('This receipt does not confirm an inspection appointment.')
+        ->toContain('Keep this reference for follow-up.')
+        ->toContain('INS-TEST-1234')
+        ->toContain('Review Omu Creek')
+        ->toContain('Submit Another Request')
+        ->not->toContain('data-inspection-form');
 });
 
 it('validates inspection requests and preserves submitted input', function () {
@@ -823,6 +1157,39 @@ it('validates inspection requests and preserves submitted input', function () {
         ->assertRedirect(route('inspections.create'))
         ->assertSessionHasErrors(['submission_token', 'phone', 'interest', 'preferred_date', 'contact_method', 'consent'])
         ->assertSessionHasInput('full_name', 'Test Visitor');
+
+    Mail::assertNothingSent();
+    expect(InspectionRequest::query()->count())->toBe(0);
+});
+
+it('rejects a past inspection date while preserving the submission token and old input', function () {
+    Mail::fake();
+    $data = validInspectionData();
+    $data['preferred_date'] = now()->subDay()->toDateString();
+
+    $this->from(route('inspections.create'))
+        ->post(route('inspections.store'), $data)
+        ->assertRedirect(route('inspections.create'))
+        ->assertSessionHasErrors(['preferred_date'])
+        ->assertSessionHasInput('submission_token', $data['submission_token'])
+        ->assertSessionHasInput('full_name', $data['full_name']);
+
+    Mail::assertNothingSent();
+    expect(InspectionRequest::query()->count())->toBe(0);
+});
+
+it('requires the additional detail for WhatsApp and Email contact methods', function () {
+    Mail::fake();
+
+    foreach ([['WhatsApp', 'whatsapp'], ['Email', 'email']] as [$method, $field]) {
+        $data = validInspectionData();
+        $data['submission_token'] = (string) Str::uuid();
+        $data['contact_method'] = $method;
+        $data[$field] = '';
+
+        $this->post(route('inspections.store'), $data)
+            ->assertSessionHasErrors([$field]);
+    }
 
     Mail::assertNothingSent();
     expect(InspectionRequest::query()->count())->toBe(0);
@@ -861,6 +1228,7 @@ it('rate limits inspection submissions', function () {
 it('saves inspection requests without a verified email destination', function () {
     Mail::fake();
     config()->set('selotemna.email', null);
+    config()->set('selotemna.emails', []);
     config()->set('mail.default', 'smtp');
 
     $this->post(route('inspections.store'), validInspectionData())

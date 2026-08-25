@@ -35,9 +35,17 @@
                 <div>
                     <h2 class="!text-sm font-semibold uppercase tracking-[0.14em] !text-white">Contact</h2>
                     <ul class="mt-5 space-y-4 text-sm leading-6 text-white/70">
-                        @if ($contact['phone_url']) <li><a href="{{ $contact['phone_url'] }}" class="hover:text-white">{{ $contact['phone'] }}</a></li> @endif
+                        @forelse ($contact['phones'] ?? [] as $phone)
+                            <li><a href="{{ $phone['url'] }}" class="hover:text-white">{{ $phone['display'] }}</a></li>
+                        @empty
+                            @if ($contact['phone_url']) <li><a href="{{ $contact['phone_url'] }}" class="hover:text-white">{{ $contact['phone'] }}</a></li> @endif
+                        @endforelse
                         @if ($contact['whatsapp_url']) <li><a href="{{ $contact['whatsapp_url'] }}" class="hover:text-white">Chat on WhatsApp</a></li> @endif
-                        @if ($contact['email_url']) <li><a href="{{ $contact['email_url'] }}" class="break-words hover:text-white">{{ $contact['email'] }}</a></li> @endif
+                        @forelse ($contact['emails'] ?? [] as $email)
+                            <li><a href="{{ $email['url'] }}" class="break-words hover:text-white">{{ $email['address'] }}</a></li>
+                        @empty
+                            @if ($contact['email_url']) <li><a href="{{ $contact['email_url'] }}" class="break-words hover:text-white">{{ $contact['email'] }}</a></li> @endif
+                        @endforelse
                         @if ($contact['address']) <li>{{ $contact['address'] }}</li> @endif
                         @if ($contact['business_hours']) <li>{{ $contact['business_hours'] }}</li> @endif
                     </ul>

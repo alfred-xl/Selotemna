@@ -1,9 +1,17 @@
 <?php
 
 return [
-    'phone' => env('SELOTEMNA_PHONE'),
+    'phone' => env('SELOTEMNA_PRIMARY_PHONE') ?: (env('SELOTEMNA_PHONE') ?: '09051512521'),
+    'phones' => [
+        'primary' => env('SELOTEMNA_PRIMARY_PHONE') ?: (env('SELOTEMNA_PHONE') ?: '09051512521'),
+        'secondary' => env('SELOTEMNA_SECONDARY_PHONE') ?: '08024066013',
+    ],
     'whatsapp' => env('SELOTEMNA_WHATSAPP'),
-    'email' => env('SELOTEMNA_EMAIL'),
+    'email' => env('SELOTEMNA_PRIMARY_EMAIL') ?: (env('SELOTEMNA_EMAIL') ?: 'info@selotemna.com'),
+    'emails' => [
+        'primary' => env('SELOTEMNA_PRIMARY_EMAIL') ?: (env('SELOTEMNA_EMAIL') ?: 'info@selotemna.com'),
+        'secondary' => env('SELOTEMNA_SECONDARY_EMAIL') ?: 'selotemna@gmail.com',
+    ],
     'address' => env('SELOTEMNA_ADDRESS'),
     'business_hours' => env('SELOTEMNA_BUSINESS_HOURS'),
 
@@ -57,6 +65,7 @@ return [
         'video_poster' => env('SELOTEMNA_OMU_CREEK_VIDEO_POSTER'),
         'short_video_url' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL') ?: 'https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4',
         'short_video_poster' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_POSTER'),
+        'brochure_url' => env('SELOTEMNA_OMU_CREEK_BROCHURE_URL'),
     ],
 
     'homepage_faq_ids' => [

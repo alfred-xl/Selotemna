@@ -16,6 +16,7 @@ class FaqController extends Controller
             'description' => 'Read approved answers about the Omu Creek Upcoming Project, including its location, title, pricing, charges, allocation and policies.',
             'faqGroups' => $this->content->faqGroups(),
             'contact' => $this->content->contactDetails(),
+            'heroImage' => $this->content->featuredPropertyHeroImage(),
         ]);
     }
 }

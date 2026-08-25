@@ -22,4 +22,7 @@ Route::get('/book-inspection', [InspectionController::class, 'create'])->name('i
 Route::post('/book-inspection', [InspectionController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('inspections.store');
-Route::get('/contact', ContactController::class)->name('contact');
+Route::get('/contact', [ContactController::class, 'create'])->name('contact');
+Route::post('/contact', [ContactController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('contact.store');

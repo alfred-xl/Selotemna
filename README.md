@@ -63,6 +63,10 @@ Inspection submissions are requests. They do not automatically confirm an appoin
 
 When a valid `SELOTEMNA_EMAIL` and deliverable Laravel mailer are configured, Selotemna also receives an email containing the saved request reference. Email delivery failure is recorded without discarding the database record. The form therefore remains available when email is unconfigured or uses the `log` or `array` mailer.
 
+## Contact enquiry behavior
+
+The Contact page stores general enquiries in the separate `contact_enquiries` table before attempting an optional staff email notification. Each saved enquiry receives a human-readable reference and starts with the internal `new` status. Server validation, conditional contact-method fields, a honeypot, rate limiting, and a UUID submission token protect the flow. Duplicate tokens reuse the existing enquiry, and email failure does not discard it.
+
 ## Technology
 
 - PHP 8.3 or newer
@@ -90,13 +94,17 @@ If the local database does not have the sessions table, use a file session drive
 
 ## Current configuration
 
-Verified contact actions are hidden until values are provided:
+The verified public contacts have production-safe defaults and can be overridden through:
 
-    SELOTEMNA_PHONE=
+    SELOTEMNA_PRIMARY_PHONE=09051512521
+    SELOTEMNA_SECONDARY_PHONE=08024066013
+    SELOTEMNA_PRIMARY_EMAIL=info@selotemna.com
+    SELOTEMNA_SECONDARY_EMAIL=selotemna@gmail.com
     SELOTEMNA_WHATSAPP=
-    SELOTEMNA_EMAIL=
     SELOTEMNA_ADDRESS=
     SELOTEMNA_BUSINESS_HOURS=
+
+`SELOTEMNA_PHONE` and `SELOTEMNA_EMAIL` remain supported as legacy primary aliases. Company WhatsApp, address, and business hours stay hidden until verified values are configured.
 
 Omu Creek media is configured through:
 
@@ -119,15 +127,15 @@ The Book Inspection and Contact page heroes use `selotemna-inspection-consultati
 
 ## Architecture
 
-- app/Http/Controllers contains dedicated public-page and inspection controllers.
-- app/Models/InspectionRequest.php represents persisted inspection requests and generates public references.
-- database/migrations contains the inspection-request table alongside the Laravel foundation tables.
+- app/Http/Controllers contains dedicated public-page, inspection, and contact-enquiry controllers.
+- app/Models contains the independent inspection-request and contact-enquiry records and their public-reference generators.
+- database/migrations contains separate inspection-request and contact-enquiry tables alongside the Laravel foundation tables.
 - app/Support/SelotemnaContent.php normalises shared opportunity, project, FAQ, and safe contact data.
 - config/selotemna.php contains Omu Creek, verified projects, approved testimonial, media, FAQ, and contact configuration.
-- resources/views contains the shared Blade layout, components, public pages, and inspection email.
+- resources/views contains the shared Blade layout, components, public pages, and staff-notification emails.
 - resources/css/app.css contains Tailwind brand tokens and shared styles.
 - resources/js/app.js handles the desktop dropdown, mobile drawer, project tabs, FAQ, form-error focus, and submit-once behavior.
-- tests/Feature/PublicWebsiteTest.php covers the multipage public frontend and persisted inspection-request behavior.
+- tests/Feature/PublicWebsiteTest.php covers the multipage public frontend and the independent persisted inspection and contact-enquiry behaviors.
 - .agents/skills/design-selotemna-web contains the governing project guidance.
 - docs/selotemna-laravel-homepage-agent-handoff.md records the implemented architecture and outstanding inputs.
 

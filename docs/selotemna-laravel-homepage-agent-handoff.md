@@ -94,7 +94,13 @@ Inspection submissions are requests. They do not automatically confirm appointme
 
 The Book Inspection page is always available. It validates the visitor’s contact details, fixed Omu Creek interest, preferred date, contact method, optional message and request acknowledgement on the server. A valid submission is saved in `inspection_requests` with a unique submission token, human-readable reference, `new` status and consent timestamp before any notification is attempted.
 
-When a valid `SELOTEMNA_EMAIL` and deliverable Laravel mailer are configured, the saved request is also emailed to Selotemna. Email failure is recorded on the request without discarding it or presenting the visitor with a failed submission. Reusing the same submission token returns the existing request instead of creating a duplicate. The receipt repeats that the request and preferred date do not confirm an appointment.
+When a valid primary staff email and deliverable Laravel mailer are configured, the saved request is also emailed to Selotemna. Email failure is recorded on the request without discarding it or presenting the visitor with a failed submission. Reusing the same submission token returns the existing request instead of creating a duplicate. The receipt repeats that the request and preferred date do not confirm an appointment.
+
+## Contact behavior
+
+The verified public contacts are 0905 151 2521, 0802 406 6013, info@selotemna.com, and selotemna@gmail.com. The primary phone and email retain the legacy singular contact aliases, and info@selotemna.com is the staff-notification destination. No company WhatsApp link renders because neither telephone number is verified for WhatsApp.
+
+The Contact page saves general enquiries in the independent `contact_enquiries` table before attempting an optional staff email. Requests use server validation, conditional email and WhatsApp validation, a honeypot, rate limiting, a UUID submission token, and a human-readable reference. Duplicate tokens do not create duplicate records, and email failure does not discard a saved enquiry. General enquiries are not stored in `inspection_requests`.
 
 ## FAQ boundary
 
@@ -167,7 +173,7 @@ The current repository contains:
 - conditional contact actions;
 - a complete Omu Creek detail page and concise homepage summary.
 
-The mobile drawer contains Book an Inspection as a normal navigation link. There is no persistent mobile contact bar; verified phone and WhatsApp links appear in the drawer only when configured.
+The mobile drawer contains Book an Inspection as a normal navigation link. There is no persistent mobile contact bar; its compact direct-contact action uses the verified primary telephone number. Company WhatsApp remains hidden until a separate number is verified.
 
 Keep these foundations and the content hierarchy aligned in future changes.
 
@@ -188,9 +194,9 @@ Testimonials are supported but remain hidden until a quote, public name, relevan
 3. Real Estate Development inventory model beyond Omu Creek
 4. Detailed Engineering & Construction scope and enquiry fields
 5. Property Management scope and placement
-6. Verified contact details and operating locations
+6. Verified company WhatsApp number, office address, business hours, and operating locations
 7. Commercial-use confirmation and source files for the three supplied editorial images
 8. Approved testimonial quotations, identities, service relevance and publication permission
 9. Omu Creek video posters and accessible captions/transcripts
 10. Inspection-request privacy notice, retention period and deletion process
-11. Future staff handling method for saved requests beyond database records and optional email notification
+11. Future staff handling method for saved inspection requests and contact enquiries beyond database records and optional email notification
