@@ -827,6 +827,8 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
         assign('[data-success-time]', receipt.preferred_time);
         assign('[data-success-interest]', receipt.interest_type);
         assign('[data-success-enquiry]', receipt.enquiry_type);
+        assign('[data-success-plot]', receipt.plot);
+        assign('[data-success-timeline]', receipt.timeline);
         form.hidden = true;
         successState.hidden = false;
         successState.focus();
@@ -939,6 +941,42 @@ if (inspectionDialog && typeof inspectionDialog.showModal === 'function') {
         if (successState && !successState.hidden) successState.querySelector('[data-form-reset]')?.click();
         const focusTarget = returnFocus?.closest('[data-menu-root]') ? menuOpen : returnFocus;
         focusTarget?.focus();
+    });
+}
+
+const projectEnquiryDialog = document.querySelector('[data-project-enquiry-dialog]');
+
+if (projectEnquiryDialog && typeof projectEnquiryDialog.showModal === 'function') {
+    const enquiryPath = new URL(projectEnquiryDialog.dataset.projectEnquiryPath, window.location.href).pathname;
+    let returnFocus;
+    let previousBodyOverflow = '';
+
+    const closeProjectEnquiryDialog = () => projectEnquiryDialog.close();
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href]');
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const destination = new URL(link.href, window.location.href);
+        if (destination.origin !== window.location.origin || destination.pathname !== enquiryPath) return;
+        event.preventDefault();
+        returnFocus = link;
+        previousBodyOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        projectEnquiryDialog.showModal();
+        projectEnquiryDialog.querySelector('form input:not([type="hidden"]), form select, form textarea')?.focus();
+    });
+
+    projectEnquiryDialog.querySelectorAll('[data-project-enquiry-dialog-close]').forEach((button) => {
+        button.addEventListener('click', closeProjectEnquiryDialog);
+    });
+    projectEnquiryDialog.addEventListener('click', (event) => {
+        if (event.target === projectEnquiryDialog) closeProjectEnquiryDialog();
+    });
+    projectEnquiryDialog.addEventListener('close', () => {
+        document.body.style.overflow = previousBodyOverflow;
+        const successState = projectEnquiryDialog.querySelector('[data-async-success="project-enquiry"]');
+        if (successState && !successState.hidden) successState.querySelector('[data-form-reset]')?.click();
+        returnFocus?.focus();
     });
 }
 

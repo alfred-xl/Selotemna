@@ -44,13 +44,13 @@
     @if ($featuredProperty)
         <x-site.conversion-cta
             heading="Interested in Omu Creek?"
-            intro="Review the complete project information or request an inspection with your preferred date and contact details."
-            primary-label="Request an Inspection"
-            :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])"
+            intro="Review the complete project information or select the plot size you are considering."
+            primary-label="Select a Plot Size"
+            :primary-href="route('project-enquiries.create')"
             secondary-label="View Full Project Details"
             :secondary-href="route('omu-creek')"
         >
-            <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
+            <p class="mt-5 text-sm leading-6 text-white/70">Submitting an enquiry does not reserve a plot; availability remains subject to confirmation.</p>
         </x-site.conversion-cta>
     @endif
 @endsection

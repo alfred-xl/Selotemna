@@ -2,7 +2,7 @@
     'groups',
     'idPrefix' => 'projects',
     'featured' => false,
-    'inspectionHref' => null,
+    'enquiryHref' => null,
     'stageNote' => null,
     'emptyStates' => [],
 ])
@@ -28,7 +28,7 @@
                             <x-site.project-card
                                 :project="$project"
                                 :featured="$featured && $key === 'upcoming' && $loop->first"
-                                :inspection-href="$inspectionHref"
+                                :enquiry-href="$enquiryHref"
                                 :stage-note="$stageNote"
                             />
                         @endforeach

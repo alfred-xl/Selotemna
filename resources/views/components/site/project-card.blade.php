@@ -1,4 +1,4 @@
-@props(['project', 'featured' => false, 'inspectionHref' => null, 'stageNote' => null])
+@props(['project', 'featured' => false, 'enquiryHref' => null, 'stageNote' => null])
 
 <article @class([
     'overflow-hidden border border-ink-200 bg-white',
@@ -31,8 +31,8 @@
                 @if ($project['href'])
                     <x-site.button :href="$project['href']" class="w-full sm:w-auto">View Full Project Details</x-site.button>
                 @endif
-                @if ($inspectionHref)
-                    <x-site.button :href="$inspectionHref" variant="secondary" class="w-full sm:w-auto">Request an Inspection</x-site.button>
+                @if ($enquiryHref)
+                    <x-site.button :href="$enquiryHref" variant="secondary" class="w-full sm:w-auto">Select a Plot Size</x-site.button>
                 @endif
             </div>
             @if ($stageNote)

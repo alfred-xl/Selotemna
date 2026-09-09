@@ -9,7 +9,7 @@
                 <p class="mt-6 max-w-2xl text-base leading-7 text-white/85 sm:text-lg sm:leading-8 md:text-xl">Selotemna brings Real Estate Development and Engineering &amp; Construction together, helping clients explore property opportunities and begin focused project conversations.</p>
                 <div class="mt-8" data-hero-item data-hero-actions>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        <x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}" variant="reversed" class="w-full sm:w-auto" data-event="book_inspection_click">Request an Inspection</x-site.button>
+                        <x-site.button href="{{ route('project-enquiries.create') }}" variant="reversed" class="w-full sm:w-auto" data-property-interest="Omu Creek">Select a Plot Size</x-site.button>
                         @if ($featuredProperty)
                             <x-site.button href="{{ route('omu-creek') }}" variant="outline-reversed" class="w-full sm:w-auto">Explore Omu Creek</x-site.button>
                         @endif

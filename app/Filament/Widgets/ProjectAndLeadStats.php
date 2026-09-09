@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use App\Models\ContactEnquiry;
 use App\Models\InspectionRequest;
 use App\Models\Project;
+use App\Models\ProjectEnquiry;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -44,6 +45,10 @@ class ProjectAndLeadStats extends StatsOverviewWidget
                 ->description('Delivered projects')
                 ->color('success')
                 ->icon('heroicon-o-check-circle'),
+            Stat::make('New plot enquiries', ProjectEnquiry::query()->where('status', ProjectEnquiry::STATUS_NEW)->count())
+                ->description('Awaiting first follow-up')
+                ->color('warning')
+                ->icon('heroicon-o-chat-bubble-left-right'),
             Stat::make('New inspections', InspectionRequest::query()->where('status', InspectionRequest::STATUS_NEW)->count())
                 ->description('Awaiting first follow-up')
                 ->color('warning')

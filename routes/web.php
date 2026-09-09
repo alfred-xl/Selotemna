@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\InspectionController;
 use App\Http\Controllers\OmuCreekController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectEnquiryController;
 use App\Http\Controllers\RealEstateDevelopmentController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,10 @@ Route::get('/engineering-construction', EngineeringConstructionController::class
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/faq', FaqController::class)->name('faq');
+Route::get('/omu-creek/enquire', [ProjectEnquiryController::class, 'create'])->name('project-enquiries.create');
+Route::post('/omu-creek/enquire', [ProjectEnquiryController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('project-enquiries.store');
 Route::get('/book-inspection', [InspectionController::class, 'create'])->name('inspections.create');
 Route::post('/book-inspection', [InspectionController::class, 'store'])
     ->middleware('throttle:5,1')

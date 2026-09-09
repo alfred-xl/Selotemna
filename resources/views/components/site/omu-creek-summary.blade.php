@@ -50,7 +50,7 @@
             @endunless
 
             <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap @unless($compact) mt-8 @endunless">
-                <x-site.button href="{{ route('inspections.create', ['interest' => $property['name']]) }}" class="w-full sm:w-auto" data-property-interest="{{ $property['name'] }}">Request an Omu Creek Inspection</x-site.button>
+                <x-site.button href="{{ route('project-enquiries.create') }}" class="w-full sm:w-auto" data-property-interest="{{ $property['name'] }}">Select a Plot Size</x-site.button>
                 <x-site.button href="{{ route('omu-creek') }}" variant="secondary" class="w-full sm:w-auto">View Full Project Details</x-site.button>
             </div>
             @if ($contact['whatsapp_url'])

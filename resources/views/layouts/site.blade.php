@@ -31,6 +31,9 @@
         </main>
 
         <x-site.footer :contact="$contact" />
+        @unless (request()->routeIs('project-enquiries.create'))
+            <x-site.project-enquiry-dialog />
+        @endunless
         @unless (request()->routeIs('inspections.create'))
             <x-site.inspection-dialog />
         @endunless

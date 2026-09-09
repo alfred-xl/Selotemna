@@ -366,16 +366,16 @@ it('renders the streamlined Real Estate Development page and one final conversio
         ->toContain('What you can review Published project information Current plot sizes and outright prices Title and documentation information Inspection and enquiry options')
         ->toContain('View plot sizes and current outright prices')
         ->toContain('Interested in Omu Creek?')
-        ->toContain('Review the complete project information or request an inspection with your preferred date and contact details.')
-        ->toContain('Request an Inspection')
+        ->toContain('Review the complete project information or select the plot size you are considering.')
+        ->toContain('Select a Plot Size')
         ->toContain('View Full Project Details')
-        ->toContain('Submitting an inspection request does not automatically confirm an appointment.')
+        ->toContain('Submitting an enquiry does not reserve a plot; availability remains subject to confirmation.')
         ->not->toContain('Evaluate the opportunity')
         ->not->toContain('Enquiries and inspections')
         ->not->toContain('Move from interest to an informed next step.')
         ->not->toContain('Continue with Omu Creek or a direct enquiry.')
         ->and($content)->not->toContain('plain-panel')
-        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('project-enquiries.create').'"')
         ->toContain('href="'.route('omu-creek').'"');
 });
 
@@ -476,10 +476,10 @@ it('renders an immersive accessible homepage hero with protected actions and mot
         ->toContain('fetchpriority="high"')
         ->toContain('w-full overflow-hidden bg-ink-950')
         ->toContain('class="site-container relative z-20')
-        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('project-enquiries.create').'"')
         ->toContain('href="'.route('omu-creek').'"')
         ->toContain('href="https://wa.me/2348000000000"')
-        ->toContain('data-event="book_inspection_click"')
+        ->toContain('data-property-interest="Omu Creek"')
         ->toContain('data-event="whatsapp_click"')
         ->not->toContain('site-container-wide')
         ->not->toContain('rounded-[1.25rem]')
@@ -507,7 +507,7 @@ it('keeps the homepage hero readable when the aerial image is unavailable', func
         ->toContain('aria-hidden="true"')
         ->toContain('bg-brand-950')
         ->toContain('data-hero-overlay')
-        ->toContain('data-event="book_inspection_click"')
+        ->toContain('data-property-interest="Omu Creek"')
         ->not->toContain('fetchpriority="high"');
 });
 
@@ -524,7 +524,7 @@ it('renders the approved Omu Creek homepage project hierarchy and actions', func
         ->toContain('data-reveal-group')
         ->toContain('data-property-interest="Omu Creek"')
         ->toContain('data-event="whatsapp_click"')
-        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('project-enquiries.create').'"')
         ->toContain('href="'.route('omu-creek').'"')
         ->and($text)->toContain('LATEST PROJECT · REAL ESTATE DEVELOPMENT')
         ->toContain('Omu Creek')
@@ -533,7 +533,7 @@ it('renders the approved Omu Creek homepage project hierarchy and actions', func
         ->toContain('Opportunity Land allocation')
         ->toContain('Title Lagos State Government Allocation')
         ->toContain('Rate ₦50,000 per sqm')
-        ->toContain('Request an Omu Creek Inspection')
+        ->toContain('Select a Plot Size')
         ->toContain('View Full Project Details')
         ->not->toContain('data-price-disclosure')
         ->not->toContain('300 sqm ₦15,000,000');
@@ -548,7 +548,7 @@ it('renders the approved Omu Creek homepage project hierarchy and actions', func
 
     expect($positions)->not->toContain(false)
         ->and($positions)->toBe(collect($positions)->sort()->values()->all())
-        ->and(strpos($section[0], 'Request an Omu Creek Inspection'))->toBeLessThan(strpos($section[0], 'View Full Project Details'));
+        ->and(strpos($section[0], 'Select a Plot Size'))->toBeLessThan(strpos($section[0], 'View Full Project Details'));
 });
 
 it('renders the compact asymmetric homepage about transition', function () {
@@ -660,6 +660,26 @@ it('renders the complete verified Omu Creek facts and corrected survey charge', 
         ->assertSee('assets/images/omu-creek.png', false)
         ->assertSee('assets/images/omu-creek-2.png', false)
         ->assertSee('Prices exclude applicable taxes. Availability and property information are subject to confirmation.');
+});
+
+it('keeps Omu Creek actions focused by page position', function () {
+    $content = $this->get(route('omu-creek'))->assertOk()->getContent();
+    $phoneUrl = app(SelotemnaContent::class)->contactDetails()['phone_url'];
+
+    preg_match('/<div[^>]*data-omu-overview-actions[^>]*>.*?<\/div>/s', $content, $overviewActions);
+    preg_match('/<section[^>]*data-omu-final-cta[^>]*>.*?<\/section>/s', $content, $finalCta);
+
+    expect($overviewActions)->not->toBeEmpty()
+        ->and($overviewActions[0])->toContain('Select a Plot Size')
+        ->not->toContain('Request an Inspection')
+        ->and($finalCta)->not->toBeEmpty()
+        ->and($finalCta[0])->toContain('Request an Inspection')
+        ->toContain('Call an Agent')
+        ->toContain('href="'.$phoneUrl.'"')
+        ->toContain('Submitting an inspection request does not automatically confirm an appointment.')
+        ->not->toContain('Select a Plot Size')
+        ->not->toContain('View Project FAQs')
+        ->not->toContain('Download Omu Creek Brochure');
 });
 
 it('autoplays only the muted short Omu Creek preview and keeps the detailed video user initiated', function () {
@@ -788,9 +808,9 @@ it('publishes the featured Omu Creek record and honest project-stage empty state
         ->toContain(config('selotemna.projects.upcoming.items.0.summary'))
         ->toContain('data-project-featured')
         ->toContain('View Full Project Details')
-        ->toContain('Request an Inspection')
+        ->toContain('Select a Plot Size')
         ->toContain('href="'.route('omu-creek').'"')
-        ->toContain('href="'.route('inspections.create', ['interest' => 'Omu Creek']).'"')
+        ->toContain('href="'.route('project-enquiries.create').'"')
         ->and($projects)->toHaveCount(1)
         ->and($projects->first()['name'])->toBe('Omu Creek')
         ->and(config('selotemna.temporary_projects'))->toBeNull()
@@ -812,8 +832,8 @@ it('publishes the featured Omu Creek record and honest project-stage empty state
         ->and($content)->toContain('<title>Projects | Selotemna</title>')
         ->toContain('<meta name="description" content="Explore Selotemna projects by stage, including Omu Creek, the company’s latest project and current opportunity with detailed public information.">')
         ->toContain('Interested in Omu Creek?')
-        ->toContain('Review the complete project information or request an inspection with your preferred date and contact details.')
-        ->toContain('Submitting an inspection request does not automatically confirm an appointment.');
+        ->toContain('Review the complete project information or select the plot size you are considering.')
+        ->toContain('Submitting an enquiry does not reserve a plot; availability remains subject to confirmation.');
 });
 
 it('keeps the same verified Omu Creek project in production', function () {

@@ -128,7 +128,7 @@
                 </dl>
 
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap" data-omu-overview-actions>
-                    <x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}" class="w-full sm:w-auto" data-property-interest="Omu Creek">Request an Inspection</x-site.button>
+                    <x-site.button href="{{ route('project-enquiries.create') }}" class="w-full sm:w-auto" data-property-interest="Omu Creek">Select a Plot Size</x-site.button>
                     @if ($featuredProperty['brochure_url'])
                         <x-site.brochure-button :href="$featuredProperty['brochure_url']" class="w-full sm:w-auto" />
                     @endif
@@ -282,13 +282,10 @@
         <div class="site-container" data-reveal>
             <div class="max-w-3xl">
                 <h2 class="text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-tight !text-white">Take the next step with Omu Creek.</h2>
-                <p class="mt-5 max-w-2xl text-lg leading-8 text-white/80">Review the available information, then request an inspection to discuss the opportunity with the Selotemna team.</p>
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-white/80">Request an inspection to visit Omu Creek, or call the Selotemna team to discuss the project and your next step.</p>
                 <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                    <x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}" variant="reversed" class="w-full sm:w-auto" data-property-interest="Omu Creek">Request an Inspection</x-site.button>
-                    @if ($featuredProperty['brochure_url'])
-                        <x-site.brochure-button :href="$featuredProperty['brochure_url']" variant="reversed" class="w-full sm:w-auto" />
-                    @endif
-                    <x-site.button href="{{ route('faq') }}" variant="outline-reversed" class="w-full sm:w-auto">View Project FAQs</x-site.button>
+                    <x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}" variant="reversed" class="w-full sm:w-auto">Request an Inspection</x-site.button>
+                    <x-site.button href="{{ $contact['phone_url'] }}" variant="outline-reversed" class="w-full sm:w-auto" data-event="call_agent_click">Call an Agent</x-site.button>
                 </div>
                 <p class="mt-6 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
             </div>
