@@ -2,8 +2,19 @@
 
 namespace App\Support;
 
+use App\Enums\ProjectMediaRole;
+use App\Models\Project;
+use App\Models\ProjectMedia;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
+
 final class SelotemnaContent
 {
+    private ?bool $managedProjectsAreAuthoritative = null;
+
+    /** @var Collection<int, Project>|null */
+    private ?Collection $managedPublishedProjects = null;
+
     /** @return array<string, mixed> */
     public function contactDetails(): array
     {
@@ -61,14 +72,42 @@ final class SelotemnaContent
     /** @return array<string, mixed> */
     public function featuredProperty(): array
     {
+        if ($this->usesManagedProjects()) {
+            $project = $this->publishedProjects()->firstWhere('is_featured', true);
+
+            return $project instanceof Project ? $this->featuredPropertyArray($project) : [];
+        }
+
         $property = config('selotemna.featured_property', []);
         $property['video_url'] = $this->optionalString($property['video_url'] ?? null);
         $property['video_poster'] = $this->optionalString($property['video_poster'] ?? null);
         $property['short_video_url'] = $this->optionalString($property['short_video_url'] ?? null);
         $property['short_video_poster'] = $this->optionalString($property['short_video_poster'] ?? null);
+        $property['hero_image'] = $this->publicAsset($property['hero_image'] ?? null);
+        $property['gallery_image'] = $this->publicAsset($property['gallery_image'] ?? null);
         $property['brochure_url'] = $this->pdfDocumentUrl($property['brochure_url'] ?? null);
 
         return $property;
+    }
+
+    /** @return array<string, mixed> */
+    public function project(string $slug): array
+    {
+        if ($this->usesManagedProjects()) {
+            $project = $this->publishedProjects()->firstWhere('slug', $slug);
+
+            return $project instanceof Project ? $this->featuredPropertyArray($project) : [];
+        }
+
+        return $slug === 'omu-creek' ? $this->featuredProperty() : [];
+    }
+
+    /** @return array<string, mixed> */
+    public function projectPreview(Project $project): array
+    {
+        $project->loadMissing($this->projectRelations());
+
+        return $this->featuredPropertyArray($project);
     }
 
     /** @return array<string, string|null> */
@@ -83,13 +122,14 @@ final class SelotemnaContent
     {
         $property = $this->featuredProperty();
 
-        return $property['video_poster']
+        return $property['hero_image']
+            ?? $property['video_poster']
             ?? $property['short_video_poster']
             ?? $this->siteMedia()['development_aerial']
             ?? null;
     }
 
-    /** @return array<string, array<string, string>> */
+    /** @return array<string, array{url: string, sourceUrl: string|null, credit: string|null, alt: string}> */
     public function editorialMedia(): array
     {
         return collect(config('selotemna.editorial_media', []))
@@ -103,7 +143,13 @@ final class SelotemnaContent
                 $credit = $this->optionalString($media['credit'] ?? null);
                 $alt = $this->optionalString($media['alt'] ?? null);
 
-                if (! $url || ! $sourceUrl || ! $credit || ! $alt || ! str_starts_with($sourceUrl, 'https://')) {
+                if (! $url || ! $alt) {
+                    return null;
+                }
+
+                $hasAttribution = $sourceUrl !== null || $credit !== null;
+
+                if ($hasAttribution && (! $sourceUrl || ! $credit || ! str_starts_with($sourceUrl, 'https://'))) {
                     return null;
                 }
 
@@ -133,6 +179,10 @@ final class SelotemnaContent
     /** @return array<string, array<string, mixed>> */
     public function projectGroups(?string $division = null, bool $includeEmptyGroups = false): array
     {
+        if ($this->usesManagedProjects()) {
+            return $this->managedProjectGroups($division, $includeEmptyGroups);
+        }
+
         $groups = config('selotemna.projects', []);
         $featuredProperty = $this->featuredProperty();
 
@@ -147,7 +197,7 @@ final class SelotemnaContent
                 $routeName = $this->optionalString($project['route'] ?? null);
                 $project['href'] = $routeName ? route($routeName) : null;
                 $project['media_url'] = ($project['slug'] ?? null) === 'omu-creek'
-                    ? $featuredProperty['short_video_poster']
+                    ? ($featuredProperty['hero_image'] ?? $featuredProperty['short_video_poster'])
                     : $this->publicAsset($project['media_path'] ?? null);
 
                 return $project;
@@ -199,14 +249,58 @@ final class SelotemnaContent
     }
 
     /** @return array<string, array<string, mixed>> */
-    public function faqGroups(): array
+    public function faqGroups(string $projectSlug = 'omu-creek'): array
     {
+        if ($this->usesManagedProjects()) {
+            $project = $this->publishedProjects()->firstWhere('slug', $projectSlug);
+
+            if (! $project instanceof Project) {
+                return [];
+            }
+
+            return $project->faqGroups
+                ->mapWithKeys(fn ($group): array => [
+                    $group->slug => [
+                        'label' => $group->label,
+                        'items' => $group->faqs->map(fn ($faq): array => [
+                            'id' => $faq->key,
+                            'question' => $faq->question,
+                            'answer' => $faq->answer,
+                            'points' => $faq->points ?? [],
+                            'note' => $faq->note,
+                        ])->all(),
+                    ],
+                ])
+                ->all();
+        }
+
         return config('selotemna.faq_groups', []);
     }
 
     /** @return array<int, array<string, mixed>> */
     public function homepageFaqs(): array
     {
+        if ($this->usesManagedProjects()) {
+            $project = $this->publishedProjects()->firstWhere('slug', 'omu-creek');
+
+            if (! $project instanceof Project) {
+                return [];
+            }
+
+            return $project->faqGroups
+                ->flatMap->faqs
+                ->where('is_featured', true)
+                ->map(fn ($faq): array => [
+                    'id' => $faq->key,
+                    'question' => $faq->question,
+                    'answer' => $faq->answer,
+                    'points' => $faq->points ?? [],
+                    'note' => $faq->note,
+                ])
+                ->values()
+                ->all();
+        }
+
         return $this->faqsByIds(config('selotemna.homepage_faq_ids', []));
     }
 
@@ -297,5 +391,167 @@ final class SelotemnaContent
         }
 
         return $this->publicAsset($value);
+    }
+
+    private function usesManagedProjects(): bool
+    {
+        return $this->managedProjectsAreAuthoritative ??= Schema::hasTable('projects')
+            && Project::withTrashed()->exists();
+    }
+
+    /** @return Collection<int, Project> */
+    private function publishedProjects(): Collection
+    {
+        return $this->managedPublishedProjects ??= Project::query()
+            ->published()
+            ->ordered()
+            ->with($this->projectRelations())
+            ->get();
+    }
+
+    /** @return array<string, array{label: string, items: array<int, array<string, mixed>>}> */
+    private function managedProjectGroups(?string $division, bool $includeEmptyGroups): array
+    {
+        $stageLabels = [
+            'upcoming' => 'Upcoming',
+            'ongoing' => 'Ongoing',
+            'completed' => 'Completed',
+        ];
+
+        $projects = $this->publishedProjects()
+            ->when($division !== null, fn (Collection $items): Collection => $items->filter(
+                fn (Project $project): bool => $project->division->value === $division,
+            ));
+
+        $groups = collect($stageLabels)->mapWithKeys(fn (string $label, string $stage): array => [
+            $stage => [
+                'label' => $label,
+                'items' => $projects
+                    ->filter(fn (Project $project): bool => $project->status->value === $stage)
+                    ->map(fn (Project $project): array => $this->projectCardArray($project))
+                    ->values()
+                    ->all(),
+            ],
+        ]);
+
+        if (! $includeEmptyGroups) {
+            $groups = $groups->filter(fn (array $group): bool => $group['items'] !== []);
+        }
+
+        return $groups->all();
+    }
+
+    /** @return array<string, mixed> */
+    private function projectCardArray(Project $project): array
+    {
+        $media = $this->preferredProjectImage($project);
+
+        return [
+            'slug' => $project->slug,
+            'name' => $project->name,
+            'status' => $project->status->label(),
+            'division' => $project->division->value,
+            'summary' => $project->summary,
+            'href' => $project->slug === 'omu-creek' ? route('omu-creek') : route('projects.show', ['slug' => $project->slug]),
+            'media_url' => $media?->source_url,
+            'media_alt' => $media?->alt_text,
+        ];
+    }
+
+    /** @return array<string, mixed> */
+    private function featuredPropertyArray(Project $project): array
+    {
+        $media = $project->media->keyBy(fn (ProjectMedia $item): string => $item->role->value);
+
+        return [
+            'name' => $project->name,
+            'slug' => $project->slug,
+            'division' => $project->division->value,
+            'summary' => $project->summary,
+            'status' => $project->status->label(),
+            'type' => $project->project_type,
+            'title' => $project->land_title,
+            'overview' => $project->overview ?: $project->summary,
+            'marketing' => $project->marketing_summary,
+            'locations' => $project->locations->pluck('name')->all(),
+            'title_information' => $project->title_information,
+            'price_per_sqm' => $project->price_per_sqm,
+            'currency' => $project->currency,
+            'options' => $project->plotOptions->map(fn ($option): array => [
+                'label' => $option->label,
+                'size_sqm' => (float) $option->size_sqm,
+                'price' => $option->price,
+                'currency' => $option->currency,
+            ])->all(),
+            'payment_plan' => $project->paymentPlan ? [
+                'initial_deposit' => $project->paymentPlan->initial_deposit,
+                'balance_period' => $project->paymentPlan->balance_period,
+                'note' => $project->paymentPlan->note,
+                'currency' => $project->paymentPlan->currency,
+            ] : null,
+            'charges' => $project->charges->map(fn ($charge): array => [
+                'label' => $charge->label,
+                'value' => $charge->value,
+            ])->all(),
+            'documents' => $project->documentStages->map(fn ($stage): array => [
+                'stage' => $stage->stage,
+                'items' => $stage->documents->pluck('name')->all(),
+            ])->all(),
+            'planned_infrastructure' => $project->infrastructure->pluck('name')->all(),
+            'allocation' => $project->allocation_details,
+            'construction' => $project->construction_details,
+            'policies' => $project->policies->pluck('body')->all(),
+            'policy_items' => $project->policies->map(fn ($policy): array => [
+                'heading' => $policy->heading,
+                'body' => $policy->body,
+            ])->all(),
+            'disclaimer' => $project->disclaimer,
+            'canonical_path' => $project->canonical_path,
+            'seo_title' => $project->seo_title,
+            'seo_description' => $project->seo_description,
+            'video_url' => $media->get(ProjectMediaRole::DetailVideo->value)?->source_url,
+            'video_poster' => $media->get(ProjectMediaRole::DetailVideoPoster->value)?->source_url,
+            'short_video_url' => $media->get(ProjectMediaRole::PreviewVideo->value)?->source_url,
+            'short_video_poster' => $media->get(ProjectMediaRole::PreviewVideoPoster->value)?->source_url,
+            'brochure_url' => $media->get(ProjectMediaRole::Brochure->value)?->source_url,
+            'hero_image' => $this->preferredProjectImage($project)?->source_url,
+            'hero_image_alt' => $this->preferredProjectImage($project)?->alt_text,
+            'gallery_image' => $media->get(ProjectMediaRole::GalleryImage->value)?->source_url,
+            'gallery_image_alt' => $media->get(ProjectMediaRole::GalleryImage->value)?->alt_text,
+        ];
+    }
+
+    /** @return array<int, string> */
+    private function projectRelations(): array
+    {
+        return [
+            'locations',
+            'media',
+            'plotOptions',
+            'paymentPlan',
+            'charges',
+            'documentStages.documents',
+            'infrastructure',
+            'policies',
+            'faqGroups.faqs',
+        ];
+    }
+
+    private function preferredProjectImage(Project $project): ?ProjectMedia
+    {
+        foreach ([
+            ProjectMediaRole::HeroImage,
+            ProjectMediaRole::GalleryImage,
+            ProjectMediaRole::PreviewVideoPoster,
+            ProjectMediaRole::DetailVideoPoster,
+        ] as $role) {
+            $media = $project->media->first(fn (ProjectMedia $item): bool => $item->role === $role);
+
+            if ($media) {
+                return $media;
+            }
+        }
+
+        return null;
     }
 }

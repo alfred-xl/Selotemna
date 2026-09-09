@@ -35,7 +35,13 @@ class StoreInspectionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'full_name.required' => 'Please enter your full name.',
+            'phone.required' => 'Please enter your telephone number.',
+            'phone.min' => 'Please enter a valid telephone number.',
+            'email.email' => 'Please enter a valid email address.',
+            'preferred_date.required' => 'Please choose a preferred inspection date.',
             'preferred_date.after_or_equal' => 'Choose today or a future preferred date.',
+            'contact_method.required' => 'Please choose how you would like us to contact you.',
             'email.required_if' => 'Enter an email address when Email is your preferred contact method.',
             'whatsapp.required_if' => 'Enter a WhatsApp number when WhatsApp is your preferred contact method.',
             'interest.in' => 'The inspection request must be for the published Omu Creek opportunity.',

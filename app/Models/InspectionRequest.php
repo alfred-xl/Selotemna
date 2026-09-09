@@ -9,6 +9,10 @@ class InspectionRequest extends Model
 {
     public const STATUS_NEW = 'new';
 
+    public const STATUS_CONTACTED = 'contacted';
+
+    public const STATUS_CLOSED = 'closed';
+
     /** @var list<string> */
     protected $fillable = [
         'submission_token',
@@ -23,6 +27,8 @@ class InspectionRequest extends Model
         'preferred_date',
         'preferred_time',
         'message',
+        'admin_notes',
+        'handled_at',
         'consented_at',
         'staff_notified_at',
         'notification_failed_at',
@@ -43,6 +49,17 @@ class InspectionRequest extends Model
             'consented_at' => 'datetime',
             'staff_notified_at' => 'datetime',
             'notification_failed_at' => 'datetime',
+            'handled_at' => 'datetime',
+        ];
+    }
+
+    /** @return array<string, string> */
+    public static function statusOptions(): array
+    {
+        return [
+            self::STATUS_NEW => 'New',
+            self::STATUS_CONTACTED => 'Contacted',
+            self::STATUS_CLOSED => 'Closed',
         ];
     }
 

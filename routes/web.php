@@ -17,6 +17,7 @@ Route::get('/real-estate-development', RealEstateDevelopmentController::class)->
 Route::get('/real-estate-development/omu-creek', OmuCreekController::class)->name('omu-creek');
 Route::get('/engineering-construction', EngineeringConstructionController::class)->name('engineering-construction');
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
 Route::get('/faq', FaqController::class)->name('faq');
 Route::get('/book-inspection', [InspectionController::class, 'create'])->name('inspections.create');
 Route::post('/book-inspection', [InspectionController::class, 'store'])

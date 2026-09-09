@@ -10,7 +10,9 @@
                 <div class="mt-8" data-hero-item data-hero-actions>
                     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                         <x-site.button href="{{ route('inspections.create', ['interest' => 'Omu Creek']) }}" variant="reversed" class="w-full sm:w-auto" data-event="book_inspection_click">Request an Inspection</x-site.button>
-                        <x-site.button href="{{ route('omu-creek') }}" variant="outline-reversed" class="w-full sm:w-auto">Explore Omu Creek</x-site.button>
+                        @if ($featuredProperty)
+                            <x-site.button href="{{ route('omu-creek') }}" variant="outline-reversed" class="w-full sm:w-auto">Explore Omu Creek</x-site.button>
+                        @endif
                     </div>
                     @if ($contact['whatsapp_url'])
                         <a href="{{ $contact['whatsapp_url'] }}" class="text-link mt-4 text-white decoration-white/60 hover:text-white focus-visible:ring-white focus-visible:ring-offset-ink-950" data-event="whatsapp_click" data-hero-whatsapp>Chat on WhatsApp</a>
@@ -47,7 +49,9 @@
         </div>
     </section>
 
-    <x-site.omu-creek-summary :property="$featuredProperty" :contact="$contact" />
+    @if ($featuredProperty)
+        <x-site.omu-creek-summary :property="$featuredProperty" :contact="$contact" compact />
+    @endif
 
     <section class="bg-brand-50 py-16 md:py-20 lg:py-24" data-home-about>
         <div class="site-container grid gap-7 border-y border-brand-100 py-8 md:py-10 lg:grid-cols-[minmax(0,0.42fr)_minmax(0,1fr)] lg:gap-16 lg:py-12" data-reveal>
@@ -62,15 +66,17 @@
 
     <x-site.testimonial-section :items="$testimonials" heading="Experiences connected to our services." intro="Only feedback approved for public use appears here." />
 
-    <section class="section-space bg-white" data-home-faq>
-        <div class="site-container grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
-            <div>
-                <x-site.section-heading eyebrow="Frequently asked questions" heading="Start with the essential Omu Creek facts." intro="Review the opportunity, land title, available plot sizes and current outright prices." />
-                <a href="{{ route('faq') }}" class="text-link mt-7">View All FAQs</a>
+    @if ($faqs)
+        <section class="section-space bg-white" data-home-faq>
+            <div class="site-container grid gap-12 lg:grid-cols-[0.75fr_1.25fr] lg:gap-20">
+                <div>
+                    <x-site.section-heading eyebrow="Frequently asked questions" heading="Start with the essential Omu Creek facts." intro="Review the opportunity, land title, available plot sizes and current outright prices." />
+                    <a href="{{ route('faq') }}" class="text-link mt-7">View All FAQs</a>
+                </div>
+                <x-site.faq :items="$faqs" id-prefix="home-faq" />
             </div>
-            <x-site.faq :items="$faqs" id-prefix="home-faq" />
-        </div>
-    </section>
+        </section>
+    @endif
 
     <x-site.conversion-cta heading="Choose a clear next step." intro="Request an Omu Creek inspection or contact Selotemna about a Real Estate Development, Engineering or Construction requirement." secondary-label="Contact Selotemna" :secondary-href="route('contact')">
         <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>

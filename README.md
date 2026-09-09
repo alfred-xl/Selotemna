@@ -22,11 +22,12 @@ The homepage is a concise overview, with detailed content on dedicated company, 
 - `/real-estate-development/omu-creek` — Omu Creek detail
 - `/engineering-construction` — Engineering & Construction
 - `/projects` — Projects
+- `/projects/{slug}` — published project detail pages
 - `/book-inspection` — Book Inspection request
 - `/faq` — FAQ
 - `/contact` — Contact
 
-The homepage routes detailed exploration to these pages. A generic Project Detail route is intentionally deferred until verified project records and slugs are supplied.
+The homepage routes detailed exploration to these pages. Published managed projects use `/projects/{slug}`; Omu Creek retains its verified canonical route at `/real-estate-development/omu-creek`.
 
 ## Projects direction
 

@@ -50,6 +50,7 @@ function validContactEnquiryData(): array
         'email' => 'visitor@example.test',
         'whatsapp' => '',
         'contact_method' => 'Telephone',
+        'interest_type' => 'Both',
         'enquiry_type' => 'General enquiry',
         'project_type' => '',
         'proposed_location' => '',
@@ -128,7 +129,7 @@ it('uses the reusable centred image overlay hero on the approved pages', functio
     expect($developmentHero)->not->toBeEmpty()
         ->and(substr_count($developmentHero[0], '<h1'))->toBe(1)
         ->and($developmentHero[0])->toContain('data-page-hero-variant="overlay"')
-        ->toContain('https://media.example.test/omu-creek-short-poster.jpg')
+        ->toContain(asset('assets/images/omu-creek.png'))
         ->toContain('style="object-position: 50% 50%;"')
         ->toContain('data-page-hero-alignment="center"')
         ->toContain('data-page-hero-size="compact"')
@@ -170,7 +171,7 @@ it('uses the reusable centred image overlay hero on the approved pages', functio
     expect($projectsHero)->not->toBeEmpty()
         ->and(substr_count($projectsHero[0], '<h1'))->toBe(1)
         ->and($projectsHero[0])->toContain('data-page-hero-variant="overlay"')
-        ->toContain('https://media.example.test/omu-creek-short-poster.jpg')
+        ->toContain(asset('assets/images/omu-creek.png'))
         ->toContain('style="object-position: 50% 50%;"')
         ->toContain('data-page-hero-alignment="center"')
         ->toContain('data-page-hero-size="compact"')
@@ -206,7 +207,8 @@ it('uses the branded hero fallback when the construction image is unavailable', 
         ->not->toContain('data-page-hero-image');
 });
 
-it('uses the development aerial when the Omu Creek hero poster is unavailable', function () {
+it('uses the development aerial when the Omu Creek hero imagery is unavailable', function () {
+    config()->set('selotemna.featured_property.hero_image', null);
     config()->set('selotemna.featured_property.short_video_poster', null);
 
     foreach (['real-estate-development', 'projects.index'] as $routeName) {
@@ -362,7 +364,7 @@ it('renders the streamlined Real Estate Development page and one final conversio
         ->and($text)->toContain('Our development work Development opportunities presented with the facts in view.')
         ->toContain('Selotemna has undertaken previous real estate development projects. Omu Creek is the latest project and the current opportunity with detailed public information available.')
         ->toContain('What you can review Published project information Current plot sizes and outright prices Title and documentation information Inspection and enquiry options')
-        ->toContain('Current outright prices')
+        ->toContain('View plot sizes and current outright prices')
         ->toContain('Interested in Omu Creek?')
         ->toContain('Review the complete project information or request an inspection with your preferred date and contact details.')
         ->toContain('Request an Inspection')
@@ -531,25 +533,15 @@ it('renders the approved Omu Creek homepage project hierarchy and actions', func
         ->toContain('Opportunity Land allocation')
         ->toContain('Title Lagos State Government Allocation')
         ->toContain('Rate ₦50,000 per sqm')
-        ->toContain('Review the complete project information.')
-        ->toContain('Understand the information available before making an enquiry or requesting an inspection.')
-        ->toContain('Payment terms and applicable charges')
-        ->toContain('Documentation and allocation information')
-        ->toContain('Infrastructure plans and project policies')
-        ->toContain('Current outright prices')
-        ->toContain('300 sqm ₦15,000,000')
-        ->toContain('500 sqm ₦25,000,000')
-        ->toContain('1,000 sqm ₦50,000,000')
-        ->toContain(config('selotemna.featured_property.disclaimer'))
         ->toContain('Request an Omu Creek Inspection')
-        ->toContain('View Full Project Details');
+        ->toContain('View Full Project Details')
+        ->not->toContain('data-price-disclosure')
+        ->not->toContain('300 sqm ₦15,000,000');
 
     $orderedHooks = [
         'data-omu-creek-media',
         'data-omu-creek-summary',
         'data-omu-creek-facts',
-        'data-omu-creek-information',
-        'data-omu-creek-prices',
         'data-omu-creek-actions',
     ];
     $positions = array_map(fn (string $hook): int|false => strpos($section[0], $hook), $orderedHooks);
@@ -665,10 +657,12 @@ it('renders the complete verified Omu Creek facts and corrected survey charge', 
         ->assertSee('₦50,000 per sqm')
         ->assertSee('Registered Survey')
         ->assertSee('₦1,500,000')
+        ->assertSee('assets/images/omu-creek.png', false)
+        ->assertSee('assets/images/omu-creek-2.png', false)
         ->assertSee('Prices exclude applicable taxes. Availability and property information are subject to confirmation.');
 });
 
-it('uses the approved Omu Creek videos in their intended locations without autoplay', function () {
+it('autoplays only the muted short Omu Creek preview and keeps the detailed video user initiated', function () {
     $featuredProperty = config('selotemna.featured_property');
     $homepage = $this->get(route('home'))->assertOk()->getContent();
     $detailPage = $this->get(route('omu-creek'))->assertOk()->getContent();
@@ -683,13 +677,32 @@ it('uses the approved Omu Creek videos in their intended locations without autop
     preg_match('/<video[^>]*data-event="omu_creek_short_video_play"[^>]*>/s', $homepage, $homepageVideo);
     preg_match('/<video[^>]*data-event="omu_creek_video_play"[^>]*>/s', $detailPage, $detailVideo);
 
-    foreach ([$homepageVideo[0], $detailVideo[0]] as $video) {
-        expect($video)->toContain('controls')
-            ->toContain('playsinline')
-            ->toContain('preload="metadata"')
-            ->not->toContain('autoplay')
-            ->not->toContain('loop');
-    }
+    expect($homepageVideo[0])->toContain('controls')
+        ->toContain('autoplay')
+        ->toContain('muted')
+        ->toContain('playsinline')
+        ->toContain('data-autoplay-preview')
+        ->not->toContain('loop')
+        ->and($detailVideo[0])->toContain('controls')
+        ->toContain('playsinline')
+        ->toContain('preload="metadata"')
+        ->not->toContain('autoplay')
+        ->not->toContain('loop');
+});
+
+it('publishes accurate Omu Creek real-estate listing data without claiming availability', function () {
+    $content = $this->get(route('omu-creek'))->assertOk()->getContent();
+    preg_match('/<script type="application\/ld\+json">(.*?)<\/script>/s', $content, $schemaMatch);
+    $schema = json_decode($schemaMatch[1] ?? '', true, flags: JSON_THROW_ON_ERROR);
+
+    expect($schema['@type'])->toBe('RealEstateListing')
+        ->and($schema['name'])->toBe('Omu Creek')
+        ->and($schema['offers'])->toHaveCount(3)
+        ->and(collect($schema['offers'])->pluck('price')->all())->toBe([50000000, 25000000, 15000000])
+        ->and(collect($schema['offers'])->pluck('priceCurrency')->unique()->all())->toBe(['NGN'])
+        ->and($schema['primaryImageOfPage']['url'])->toBe(asset('assets/images/omu-creek.png'))
+        ->and($schema)->not->toHaveKey('availability')
+        ->and($content)->not->toContain('schema.org/InStock');
 });
 
 it('does not publish obsolete Omu Creek title or survey information', function () {
@@ -795,7 +808,7 @@ it('publishes the featured Omu Creek record and honest project-stage empty state
         ->not->toContain('Selotemna’s only project')
         ->and($content)->not->toContain('Layout Sample')
         ->not->toContain('Development-only')
-        ->and(Route::has('projects.show'))->toBeFalse()
+        ->and(Route::has('projects.show'))->toBeTrue()
         ->and($content)->toContain('<title>Projects | Selotemna</title>')
         ->toContain('<meta name="description" content="Explore Selotemna projects by stage, including Omu Creek, the company’s latest project and current opportunity with detailed public information.">')
         ->toContain('Interested in Omu Creek?')
@@ -919,15 +932,21 @@ it('renders the redesigned Contact page and progressively enhanced enquiry form'
         ->toContain('data-page-hero-size="compact"')
         ->toContain('Contact Selotemna')
         ->toContain('Speak with our team about Omu Creek, real estate development, or an engineering and construction requirement.')
-        ->toContain('assets/images/selotemna-contact-meeting.jpg')
+        ->toContain('assets/images/contact.jpg')
         ->not->toContain('data-page-hero-breadcrumb')
-        ->and($content)->toContain('Editorial image.')
-        ->toContain('Photo by Ninthgrid on Pexels')
+        ->and($content)->not->toContain('Editorial image.')
+        ->not->toContain('Photo by Ninthgrid on Pexels')
+        ->not->toContain('pexels.com/photo/business-meeting-in-lagos')
         ->toContain('Speak with our team')
         ->toContain('Tell us what you would like to discuss.')
         ->toContain('Share enough information for our team to understand your enquiry and determine the appropriate next step.')
         ->toContain('action="'.route('contact.store').'"')
         ->toContain('data-contact-enquiry-form')
+        ->toContain('data-async-form="contact"')
+        ->toContain('data-step-form')
+        ->toContain('name="interest_type"')
+        ->toContain('Land opportunities')
+        ->toContain('A building project')
         ->toContain('data-enquiry-type')
         ->toContain('data-engineering-fields')
         ->toContain('Project type')
@@ -939,14 +958,35 @@ it('renders the redesigned Contact page and progressively enhanced enquiry form'
         ->toContain('Engineering &amp; Construction')
         ->toContain('General enquiry')
         ->toContain('data-pending-label="Sending enquiry…"')
-        ->toContain('Property or project enquiry')
-        ->toContain('Omu Creek inspection')
-        ->toContain('Interested in visiting Omu Creek?')
+        ->toContain('Planning an Omu Creek visit?')
+        ->toContain('data-async-success="contact"')
+        ->not->toContain('Before you send an enquiry')
         ->not->toContain('Start with the right conversation.')
         ->and($script)->toContain("enquiryType?.addEventListener('change', updateEngineeringFields)")
         ->toContain("enquiryType?.value === 'Engineering & Construction'")
         ->toContain('engineeringFields.hidden = !isEngineeringEnquiry')
-        ->toContain('input.disabled = !isEngineeringEnquiry');
+        ->toContain('input.disabled = !isEngineeringEnquiry')
+        ->toContain('fetch(form.action')
+        ->toContain('response.status === 422');
+});
+
+it('renders an accessible inspection modal across the site while retaining the direct fallback page', function () {
+    $homepage = $this->get(route('home'))->assertOk()->getContent();
+    $inspectionPage = $this->get(route('inspections.create'))->assertOk()->getContent();
+    $script = file_get_contents(resource_path('js/app.js'));
+
+    expect($homepage)->toContain('data-inspection-dialog')
+        ->toContain('aria-labelledby="inspection-dialog-title"')
+        ->toContain('data-inspection-dialog-close')
+        ->toContain('data-async-form="inspection"')
+        ->toContain('data-form-step="1"')
+        ->toContain('data-form-step="2"')
+        ->toContain('data-form-step="3"')
+        ->and($inspectionPage)->not->toContain('data-inspection-dialog')
+        ->toContain('data-inspection-form')
+        ->and($script)->toContain("typeof inspectionDialog.showModal === 'function'")
+        ->toContain('destination.pathname !== inspectionPath')
+        ->toContain('focusTarget?.focus()');
 });
 
 it('validates contact enquiries and preserves the submission token and old input', function () {
@@ -966,6 +1006,22 @@ it('validates contact enquiries and preserves the submission token and old input
 
     Mail::assertNothingSent();
     expect(ContactEnquiry::query()->count())->toBe(0);
+});
+
+it('returns field errors and an in-place receipt for enhanced contact submissions', function () {
+    Mail::fake();
+    config()->set('selotemna.email', 'primary@selotemna.test');
+    config()->set('mail.default', 'smtp');
+
+    $this->postJson(route('contact.store'), array_replace(validContactEnquiryData(), ['email' => 'not-an-email', 'contact_method' => 'Email']))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['email']);
+
+    $this->postJson(route('contact.store'), validContactEnquiryData())
+        ->assertCreated()
+        ->assertJsonPath('message', 'Thanks! We got your message. We will reply within 24 hours.')
+        ->assertJsonPath('receipt.interest_type', 'Both')
+        ->assertJsonStructure(['receipt' => ['reference', 'enquiry_type', 'contact_method']]);
 });
 
 it('requires the selected contact detail and rejects the contact honeypot', function () {
@@ -1007,6 +1063,7 @@ it('saves and emails an engineering enquiry to the primary address', function ()
 
     $enquiry = ContactEnquiry::query()->sole();
     expect($enquiry->status)->toBe(ContactEnquiry::STATUS_NEW)
+        ->and($enquiry->interest_type)->toBe('Both')
         ->and($enquiry->project_type)->toBe('Commercial building')
         ->and($enquiry->proposed_location)->toBe('Lagos')
         ->and($enquiry->project_stage)->toBe('Initial planning')
@@ -1060,6 +1117,7 @@ it('renders the saved contact enquiry receipt instead of the form', function () 
     $content = $this->withSession([
         'contact_enquiry_receipt' => [
             'reference' => 'ENQ-TEST-1234',
+            'interest_type' => 'Land',
             'enquiry_type' => 'General enquiry',
             'contact_method' => 'Telephone',
         ],
@@ -1067,7 +1125,9 @@ it('renders the saved contact enquiry receipt instead of the form', function () 
 
     expect($content)->toContain('data-contact-enquiry-receipt')
         ->toContain('Enquiry received')
-        ->toContain('Your enquiry has been saved.')
+        ->toContain('Thanks! We got your message.')
+        ->toContain('We will reply within 24 hours')
+        ->toContain('Land')
         ->toContain('Keep this reference for follow-up.')
         ->toContain('ENQ-TEST-1234')
         ->toContain('Return to Home')
@@ -1116,6 +1176,10 @@ it('renders the responsive request-first inspection experience', function () {
         ->toContain('Additional information')
         ->toContain('Consent and submission')
         ->toContain('data-contact-method')
+        ->toContain('data-async-form="inspection"')
+        ->toContain('data-step-form')
+        ->toContain('I’m flexible')
+        ->toContain('data-async-success="inspection"')
         ->toContain('data-conditional-contact="WhatsApp"')
         ->toContain('data-conditional-contact="Email"')
         ->toContain('data-pending-label="Saving request…"')
@@ -1123,8 +1187,8 @@ it('renders the responsive request-first inspection experience', function () {
         ->not->toContain('mail-delivery issue')
         ->and(strpos($content, 'data-inspection-form'))->toBeLessThan(strpos($content, 'What happens next'))
         ->and($script)->toContain("contactMethod?.addEventListener('change', updateConditionalContactFields)")
-        ->toContain("form.setAttribute('aria-busy', 'true')")
-        ->toContain("button.setAttribute('aria-busy', 'true')");
+        ->toContain("form.setAttribute('aria-busy', isSubmitting ? 'true' : 'false')")
+        ->toContain("submitButton.setAttribute('aria-busy', isSubmitting ? 'true' : 'false')");
 });
 
 it('renders the saved inspection receipt instead of the form', function () {
@@ -1139,7 +1203,8 @@ it('renders the saved inspection receipt instead of the form', function () {
 
     expect($content)->toContain('data-inspection-receipt')
         ->toContain('Request received')
-        ->toContain('Your request has been saved.')
+        ->toContain('Thanks! We got your inspection request.')
+        ->toContain('We will reply within 24 hours')
         ->toContain('This receipt does not confirm an inspection appointment.')
         ->toContain('Keep this reference for follow-up.')
         ->toContain('INS-TEST-1234')
@@ -1202,7 +1267,7 @@ it('emails a valid inspection request and confirms receipt without confirming an
 
     $this->post(route('inspections.store'), validInspectionData())
         ->assertRedirect(route('inspections.create'))
-        ->assertSessionHas('status', fn (string $status): bool => str_contains($status, 'request has been received and saved') && str_contains($status, 'does not confirm an appointment'))
+        ->assertSessionHas('status', fn (string $status): bool => str_contains($status, 'Thanks! We got your inspection request.') && str_contains($status, 'does not confirm an appointment'))
         ->assertSessionHas('inspection_receipt');
 
     Mail::assertSent(InspectionRequestMail::class, fn (InspectionRequestMail $mail): bool => $mail->hasTo('inspections@selotemna.test') && $mail->inspection->project_name === 'Omu Creek');
@@ -1210,6 +1275,22 @@ it('emails a valid inspection request and confirms receipt without confirming an
         ->project_slug->toBe('omu-creek')
         ->status->toBe(InspectionRequest::STATUS_NEW)
         ->staff_notified_at->not->toBeNull();
+});
+
+it('returns field errors and an in-place receipt for enhanced inspection submissions', function () {
+    Mail::fake();
+    config()->set('selotemna.email', 'inspections@selotemna.test');
+    config()->set('mail.default', 'smtp');
+
+    $this->postJson(route('inspections.store'), array_replace(validInspectionData(), ['email' => 'not-an-email', 'contact_method' => 'Email']))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['email']);
+
+    $this->postJson(route('inspections.store'), validInspectionData())
+        ->assertCreated()
+        ->assertJsonPath('message', 'Thanks! We got your inspection request. We will reply within 24 hours to confirm the next step.')
+        ->assertJsonPath('receipt.project', 'Omu Creek')
+        ->assertJsonStructure(['receipt' => ['reference', 'preferred_date', 'preferred_time']]);
 });
 
 it('rate limits inspection submissions', function () {
@@ -1281,7 +1362,7 @@ it('requires the selected contact channel and rejects a tampered project', funct
     expect(InspectionRequest::query()->count())->toBe(0);
 });
 
-it('renders credited editorial media without presenting it as project proof', function () {
+it('renders attributed editorial media and supplied contact media appropriately', function () {
     $this->get(route('inspections.create'))
         ->assertOk()
         ->assertSee('assets/images/selotemna-inspection-consultation.jpg', false)
@@ -1291,10 +1372,10 @@ it('renders credited editorial media without presenting it as project proof', fu
 
     $this->get(route('contact'))
         ->assertOk()
-        ->assertSee('assets/images/selotemna-contact-meeting.jpg', false)
-        ->assertSee('pexels.com/photo/business-meeting-in-lagos', false)
-        ->assertSee('Photo by Ninthgrid on Pexels')
-        ->assertSee('Editorial image.');
+        ->assertSee('assets/images/contact.jpg', false)
+        ->assertDontSee('pexels.com/photo/business-meeting-in-lagos', false)
+        ->assertDontSee('Photo by Ninthgrid on Pexels')
+        ->assertDontSee('Editorial image.');
 });
 
 it('provides progressive motion hooks and reduced-motion protection', function () {
@@ -1309,7 +1390,7 @@ it('provides progressive motion hooks and reduced-motion protection', function (
         ->toContain('data-hero-sequence')
         ->toContain('data-reveal')
         ->and($projects)->toContain('data-project-card data-reveal')
-        ->and($inspection)->toContain('data-inspection-form data-submit-once data-reveal')
+        ->and($inspection)->toContain('data-inspection-form data-submit-once data-async-form="inspection" data-step-form data-reveal')
         ->and($css)->toContain('--motion-fast:')
         ->toContain('--motion-standard:')
         ->toContain('--motion-reveal:')

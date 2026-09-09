@@ -52,7 +52,7 @@
     "src": "_sora-700-normal-BKPfQAnC.woff"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DzYxU9H7.css",
+    "file": "assets/app-WZcxCDfg.css",
     "name": "app",
     "names": [
       "app.css"
@@ -61,7 +61,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BPuU7814.js",
+    "file": "assets/app-CAuTzJzk.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

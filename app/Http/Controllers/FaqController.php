@@ -11,10 +11,13 @@ class FaqController extends Controller
 
     public function __invoke(): View
     {
+        $faqGroups = $this->content->faqGroups();
+        abort_if($faqGroups === [], 404);
+
         return view('faq', [
             'title' => 'Omu Creek Frequently Asked Questions | Selotemna',
             'description' => 'Read approved answers about the Omu Creek Upcoming Project, including its location, title, pricing, charges, allocation and policies.',
-            'faqGroups' => $this->content->faqGroups(),
+            'faqGroups' => $faqGroups,
             'contact' => $this->content->contactDetails(),
             'heroImage' => $this->content->featuredPropertyHeroImage(),
         ]);

@@ -38,14 +38,16 @@
         </div>
     </section>
 
-    <x-site.conversion-cta
-        heading="Interested in Omu Creek?"
-        intro="Review the complete project information or request an inspection with your preferred date and contact details."
-        primary-label="Request an Inspection"
-        :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])"
-        secondary-label="View Full Project Details"
-        :secondary-href="route('omu-creek')"
-    >
-        <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
-    </x-site.conversion-cta>
+    @if ($featuredProperty)
+        <x-site.conversion-cta
+            heading="Interested in {{ $featuredProperty['name'] }}?"
+            intro="Review the complete project information or request an inspection with your preferred date and contact details."
+            primary-label="Request an Inspection"
+            :primary-href="route('inspections.create', ['interest' => $featuredProperty['name']])"
+            secondary-label="View Full Project Details"
+            :secondary-href="route('omu-creek')"
+        >
+            <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
+        </x-site.conversion-cta>
+    @endif
 @endsection

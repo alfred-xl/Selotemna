@@ -27,18 +27,30 @@
         </div>
     </section>
 
-    <x-site.omu-creek-summary :property="$featuredProperty" :contact="$contact" />
+    @if ($featuredProperty)
+        <x-site.omu-creek-summary :property="$featuredProperty" :contact="$contact" />
+    @else
+        <section class="section-space bg-ink-50" data-development-empty-state>
+            <div class="site-container border-y border-ink-200 py-10">
+                <h2 class="text-2xl font-semibold">No property opportunity is currently published.</h2>
+                <p class="mt-3 max-w-3xl leading-7 text-ink-500">Published Real Estate Development opportunities will appear here when their information is ready for public review.</p>
+                <a href="{{ route('contact') }}" class="text-link mt-6">Contact Selotemna</a>
+            </div>
+        </section>
+    @endif
 
     <x-site.testimonial-section :items="$testimonials" eyebrow="Real Estate Development experiences" heading="Feedback relevant to property decisions." />
 
-    <x-site.conversion-cta
-        heading="Interested in Omu Creek?"
-        intro="Review the complete project information or request an inspection with your preferred date and contact details."
-        primary-label="Request an Inspection"
-        :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])"
-        secondary-label="View Full Project Details"
-        :secondary-href="route('omu-creek')"
-    >
-        <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
-    </x-site.conversion-cta>
+    @if ($featuredProperty)
+        <x-site.conversion-cta
+            heading="Interested in Omu Creek?"
+            intro="Review the complete project information or request an inspection with your preferred date and contact details."
+            primary-label="Request an Inspection"
+            :primary-href="route('inspections.create', ['interest' => 'Omu Creek'])"
+            secondary-label="View Full Project Details"
+            :secondary-href="route('omu-creek')"
+        >
+            <p class="mt-5 text-sm leading-6 text-white/70">Submitting an inspection request does not automatically confirm an appointment.</p>
+        </x-site.conversion-cta>
+    @endif
 @endsection

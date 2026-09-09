@@ -375,6 +375,52 @@ document.querySelectorAll('[data-project-tabs]').forEach((tabGroup) => {
     activateTab(tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') ?? tabs[0], { animate: false });
 });
 
+document.querySelectorAll('[data-page-section-nav]').forEach((navigation) => {
+    const links = [...navigation.querySelectorAll('[data-page-section-link]')];
+    const currentLabel = navigation.querySelector('[data-page-section-current]');
+    const sections = [...new Set(links.map((link) => link.hash))]
+        .map((hash) => document.querySelector(hash))
+        .filter((section) => section instanceof HTMLElement);
+
+    if (links.length === 0 || sections.length === 0) return;
+
+    const setActiveSection = (sectionId) => {
+        const activeLink = links.find((link) => link.hash === `#${sectionId}`);
+
+        links.forEach((link) => {
+            if (link.hash === `#${sectionId}`) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
+        });
+
+        if (currentLabel && activeLink) currentLabel.textContent = activeLink.textContent.trim();
+    };
+
+    links.forEach((link) => {
+        link.addEventListener('click', () => {
+            setActiveSection(link.hash.slice(1));
+            link.closest('details')?.removeAttribute('open');
+        });
+    });
+
+    const hashTarget = sections.find((section) => `#${section.id}` === window.location.hash);
+    setActiveSection(hashTarget?.id ?? sections[0].id);
+
+    if (!('IntersectionObserver' in window)) return;
+
+    const sectionObserver = new IntersectionObserver(
+        (entries) => {
+            const visibleSection = entries
+                .filter((entry) => entry.isIntersecting)
+                .sort((first, second) => first.boundingClientRect.top - second.boundingClientRect.top)[0];
+
+            if (visibleSection) setActiveSection(visibleSection.target.id);
+        },
+        { rootMargin: '-28% 0px -62% 0px', threshold: [0, 0.1] },
+    );
+
+    sections.forEach((section) => sectionObserver.observe(section));
+});
+
 document.querySelectorAll('[data-faq-group]').forEach((group) => {
     const triggers = [...group.querySelectorAll('[data-faq-trigger]')];
     const panelAnimations = new WeakMap();
@@ -509,6 +555,91 @@ document.querySelector('[data-form-error-summary]')?.focus();
 document.querySelectorAll('[data-submit-once]').forEach((form) => {
     const contactMethod = form.querySelector('[data-contact-method]');
     const conditionalContactFields = [...form.querySelectorAll('[data-conditional-contact]')];
+    const asyncErrorSummary = form.querySelector('[data-async-error-summary]');
+    const formKind = form.dataset.asyncForm;
+    const successState = form.parentElement?.querySelector(`[data-async-success="${formKind}"]`);
+    const submitButton = form.querySelector('[data-submit-button]');
+    const submitLabel = submitButton?.querySelector('[data-submit-label]');
+    const submitStatus = form.querySelector('[data-submit-status]');
+    const originalSubmitLabel = submitLabel?.textContent;
+
+    const fieldErrorElement = (field) => {
+        const errorId = field.id ? `${field.id}_error` : `${formKind ?? 'form'}_${field.name}_error`;
+        let error = form.querySelector(`#${errorId}`);
+
+        if (!error) {
+            error = document.createElement('p');
+            error.id = errorId;
+            error.className = 'form-error';
+            error.dataset.generatedFieldError = field.name;
+            const target = field.type === 'radio' ? field.closest('[role="radiogroup"]') : field;
+            target?.insertAdjacentElement('afterend', error);
+        }
+
+        return error;
+    };
+
+    const fieldsForName = (name) => [...form.elements].filter((field) => field.name === name);
+
+    const clearFieldError = (field) => {
+        fieldsForName(field.name).forEach((item) => item.removeAttribute('aria-invalid'));
+        const generated = form.querySelector(`[data-generated-field-error="${field.name}"]`);
+        generated?.remove();
+
+        if (field.id) {
+            const serverError = form.querySelector(`#${field.id}_error`);
+            if (serverError && !serverError.dataset.generatedFieldError) serverError.hidden = true;
+        }
+    };
+
+    const setFieldError = (field, message) => {
+        if (!field) return;
+        const error = fieldErrorElement(field);
+        error.hidden = false;
+        error.textContent = message;
+
+        fieldsForName(field.name).forEach((item) => {
+            item.setAttribute('aria-invalid', 'true');
+            const describedBy = new Set((item.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean));
+            describedBy.add(error.id);
+            item.setAttribute('aria-describedby', [...describedBy].join(' '));
+        });
+    };
+
+    const validationMessage = (field) => {
+        if (field.validity.valueMissing) return field.dataset.requiredMessage ?? 'This field is required.';
+        if (field.validity.typeMismatch) return field.dataset.invalidMessage ?? 'Please enter a valid value.';
+        if (field.validity.tooShort) return field.dataset.invalidMessage ?? 'Please enter a complete value.';
+        if (field.validity.rangeUnderflow) return 'Please choose today or a future date.';
+        return field.dataset.invalidMessage ?? field.validationMessage;
+    };
+
+    const showSummary = (title, messages = []) => {
+        if (!asyncErrorSummary) return;
+        asyncErrorSummary.replaceChildren();
+        const heading = document.createElement('p');
+        heading.className = 'font-semibold text-ink-950';
+        heading.textContent = title;
+        asyncErrorSummary.append(heading);
+
+        if (messages.length) {
+            const list = document.createElement('ul');
+            list.className = 'mt-2 list-disc space-y-1 pl-5 text-sm leading-6';
+            messages.forEach((message) => {
+                const item = document.createElement('li');
+                item.textContent = message;
+                list.append(item);
+            });
+            asyncErrorSummary.append(list);
+        }
+
+        asyncErrorSummary.hidden = false;
+        asyncErrorSummary.focus();
+    };
+
+    const clearSummary = () => {
+        if (asyncErrorSummary) asyncErrorSummary.hidden = true;
+    };
 
     const updateConditionalContactFields = () => {
         const selectedMethod = contactMethod?.value;
@@ -517,9 +648,15 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
             const method = field.dataset.conditionalContact;
             const isRequired = selectedMethod === method;
             const requirement = form.querySelector(`[data-contact-requirement][data-method="${method}"]`);
+            const group = field.closest('[data-conditional-contact-group]');
 
             field.required = isRequired;
+            field.disabled = !isRequired;
             field.setAttribute('aria-required', isRequired ? 'true' : 'false');
+            if (group) {
+                group.hidden = !isRequired;
+                group.setAttribute('aria-hidden', isRequired ? 'false' : 'true');
+            }
 
             if (requirement) {
                 requirement.textContent = isRequired
@@ -551,21 +688,264 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
     enquiryType?.addEventListener('change', updateEngineeringFields);
     updateEngineeringFields();
 
-    form.addEventListener('submit', () => {
-        const button = form.querySelector('[data-submit-button]');
-        const label = button?.querySelector('[data-submit-label]');
-        const status = form.querySelector('[data-submit-status]');
+    const stepElements = [...form.querySelectorAll('[data-form-step]')];
+    const stepNumbers = [...new Set(stepElements.map((step) => Number(step.dataset.formStep)))].sort((a, b) => a - b);
+    let activeStepIndex = 0;
 
-        if (!button || button.disabled) return;
+    const stepIsConditionallyHidden = (step) =>
+        step.hasAttribute('data-engineering-fields') && enquiryType?.value !== 'Engineering & Construction';
 
-        form.setAttribute('aria-busy', 'true');
-        button.disabled = true;
-        button.setAttribute('aria-disabled', 'true');
-        button.setAttribute('aria-busy', 'true');
+    const activateStep = (index, { focus = false } = {}) => {
+        if (!stepNumbers.length) return;
+        activeStepIndex = Math.max(0, Math.min(index, stepNumbers.length - 1));
+        const activeNumber = stepNumbers[activeStepIndex];
 
-        if (label && button.dataset.pendingLabel) {
-            label.textContent = button.dataset.pendingLabel;
-            if (status) status.textContent = button.dataset.pendingLabel;
+        stepElements.forEach((step) => {
+            step.hidden = Number(step.dataset.formStep) !== activeNumber || stepIsConditionallyHidden(step);
+        });
+        updateConditionalContactFields();
+
+        const progress = form.querySelector('[data-step-progress]');
+        const label = form.querySelector('[data-step-label]');
+        const name = form.querySelector('[data-step-name]');
+        const bar = form.querySelector('[data-step-progress-bar]');
+        const activeElements = stepElements.filter((step) => Number(step.dataset.formStep) === activeNumber);
+        const stepTitle = activeElements.find((step) => step.dataset.stepTitle)?.dataset.stepTitle ?? '';
+
+        if (progress) progress.hidden = false;
+        if (label) label.textContent = `Step ${activeStepIndex + 1} of ${stepNumbers.length}`;
+        if (name) name.textContent = stepTitle;
+        if (bar) bar.style.width = `${((activeStepIndex + 1) / stepNumbers.length) * 100}%`;
+        if (focus) activeElements[0]?.querySelector('input, select, textarea, button')?.focus();
+    };
+
+    const validateStep = (stepIndex) => {
+        const stepNumber = stepNumbers[stepIndex];
+        const candidates = stepElements
+            .filter((step) => Number(step.dataset.formStep) === stepNumber && !step.hidden)
+            .flatMap((step) => [...step.querySelectorAll('input, select, textarea')])
+            .filter((field) => !field.disabled && field.type !== 'hidden');
+        const checkedRadioNames = new Set();
+        const errors = [];
+
+        candidates.forEach((field) => {
+            if (field.type === 'radio') {
+                if (checkedRadioNames.has(field.name)) return;
+                checkedRadioNames.add(field.name);
+                const radioGroup = fieldsForName(field.name);
+                if (field.required && !radioGroup.some((radio) => radio.checked)) {
+                    const message = field.dataset.requiredMessage ?? 'Please choose an option.';
+                    setFieldError(field, message);
+                    errors.push(message);
+                } else clearFieldError(field);
+                return;
+            }
+
+            if (!field.checkValidity()) {
+                const message = validationMessage(field);
+                setFieldError(field, message);
+                errors.push(message);
+            } else clearFieldError(field);
+        });
+
+        if (errors.length) showSummary('Please check the highlighted fields.', [...new Set(errors)]);
+        else clearSummary();
+
+        return errors.length === 0;
+    };
+
+    if (stepNumbers.length > 1) {
+        form.setAttribute('data-steps-enhanced', 'true');
+
+        stepNumbers.forEach((stepNumber, index) => {
+            const elements = stepElements.filter((step) => Number(step.dataset.formStep) === stepNumber);
+            const lastElement = elements.at(-1);
+            if (!lastElement) return;
+
+            const navigation = document.createElement('div');
+            navigation.className = 'mt-7 flex flex-col-reverse gap-3 border-t border-ink-200 pt-6 sm:flex-row sm:justify-between';
+            navigation.dataset.stepNavigation = '';
+
+            if (index > 0) {
+                const back = document.createElement('button');
+                back.type = 'button';
+                back.className = 'inline-flex min-h-12 items-center justify-center rounded-xl border border-ink-200 bg-white px-5 py-3 text-sm font-semibold hover:border-brand-700';
+                back.textContent = 'Back';
+                back.addEventListener('click', () => activateStep(index - 1, { focus: true }));
+                navigation.append(back);
+            } else navigation.append(document.createElement('span'));
+
+            if (index < stepNumbers.length - 1) {
+                const next = document.createElement('button');
+                next.type = 'button';
+                next.className = 'inline-flex min-h-12 items-center justify-center rounded-xl bg-brand-700 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-800';
+                next.textContent = 'Continue';
+                next.addEventListener('click', () => {
+                    if (validateStep(index)) activateStep(index + 1, { focus: true });
+                });
+                navigation.append(next);
+            }
+
+            lastElement.append(navigation);
+        });
+
+        const firstServerError = form.querySelector('[aria-invalid="true"]');
+        const errorStep = Number(firstServerError?.closest('[data-form-step]')?.dataset.formStep);
+        const initialIndex = stepNumbers.includes(errorStep) ? stepNumbers.indexOf(errorStep) : 0;
+        activateStep(initialIndex);
+    }
+
+    form.querySelectorAll('input, select, textarea').forEach((field) => {
+        field.addEventListener('input', () => {
+            if (field.checkValidity()) clearFieldError(field);
+        });
+        field.addEventListener('change', () => {
+            if (field.checkValidity()) clearFieldError(field);
+        });
+    });
+
+    const setSubmitting = (isSubmitting) => {
+        if (!submitButton) return;
+        form.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+        submitButton.disabled = isSubmitting;
+        submitButton.setAttribute('aria-disabled', isSubmitting ? 'true' : 'false');
+        submitButton.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
+        if (submitLabel) submitLabel.textContent = isSubmitting ? submitButton.dataset.pendingLabel : originalSubmitLabel;
+        if (submitStatus) submitStatus.textContent = isSubmitting ? submitButton.dataset.pendingLabel : '';
+    };
+
+    const showSuccess = (payload) => {
+        if (!successState) return;
+        const receipt = payload.receipt ?? {};
+        const assign = (selector, value) => {
+            const element = successState.querySelector(selector);
+            if (element) element.textContent = value ?? '';
+        };
+        assign('[data-success-message]', payload.message);
+        assign('[data-success-reference]', receipt.reference);
+        assign('[data-success-date]', receipt.preferred_date);
+        assign('[data-success-time]', receipt.preferred_time);
+        assign('[data-success-interest]', receipt.interest_type);
+        assign('[data-success-enquiry]', receipt.enquiry_type);
+        form.hidden = true;
+        successState.hidden = false;
+        successState.focus();
+    };
+
+    const showServerErrors = (errors) => {
+        const messages = [];
+        let firstErrorStep;
+
+        Object.entries(errors).forEach(([name, fieldMessages]) => {
+            const field = fieldsForName(name)[0];
+            const message = fieldMessages[0];
+            if (field) {
+                setFieldError(field, message);
+                const stepNumber = Number(field.closest('[data-form-step]')?.dataset.formStep);
+                if (stepNumbers.includes(stepNumber)) {
+                    const index = stepNumbers.indexOf(stepNumber);
+                    firstErrorStep = firstErrorStep === undefined ? index : Math.min(firstErrorStep, index);
+                }
+            }
+            messages.push(message);
+        });
+
+        if (firstErrorStep !== undefined) activateStep(firstErrorStep);
+        showSummary('Please check the highlighted fields.', messages);
+    };
+
+    form.addEventListener('submit', async (event) => {
+        if (!form.dataset.asyncForm) return;
+        event.preventDefault();
+        if (stepNumbers.length && !stepNumbers.every((_, index) => validateStep(index))) return;
+        if (!submitButton || submitButton.disabled) return;
+
+        clearSummary();
+        setSubmitting(true);
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: new FormData(form),
+                headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            });
+            const payload = await response.json().catch(() => ({}));
+
+            if (response.status === 422) {
+                showServerErrors(payload.errors ?? {});
+                return;
+            }
+            if (response.status === 429) {
+                showSummary('Too many requests were sent. Please wait a minute and try again.');
+                return;
+            }
+            if (!response.ok) throw new Error('Submission failed');
+
+            showSuccess(payload);
+        } catch {
+            showSummary('We could not send your request. Please check your connection and try again. Your entries are still here.');
+        } finally {
+            setSubmitting(false);
         }
     });
+
+    successState?.querySelector('[data-form-reset]')?.addEventListener('click', () => {
+        form.reset();
+        const token = form.querySelector('[data-submission-token], [name="submission_token"]');
+        if (token && crypto.randomUUID) token.value = crypto.randomUUID();
+        successState.hidden = true;
+        form.hidden = false;
+        updateConditionalContactFields();
+        updateEngineeringFields();
+        activateStep(0, { focus: true });
+    });
+});
+
+const inspectionDialog = document.querySelector('[data-inspection-dialog]');
+
+if (inspectionDialog && typeof inspectionDialog.showModal === 'function') {
+    const inspectionPath = new URL(inspectionDialog.dataset.inspectionPath, window.location.href).pathname;
+    let returnFocus;
+    let previousBodyOverflow = '';
+
+    const openInspectionDialog = (trigger) => {
+        returnFocus = trigger;
+        previousBodyOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        inspectionDialog.showModal();
+        inspectionDialog.querySelector('form input:not([type="hidden"]), form select, form textarea')?.focus();
+    };
+
+    const closeInspectionDialog = () => inspectionDialog.close();
+
+    document.addEventListener('click', (event) => {
+        const link = event.target.closest('a[href]');
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const destination = new URL(link.href, window.location.href);
+        if (destination.origin !== window.location.origin || destination.pathname !== inspectionPath) return;
+        event.preventDefault();
+        openInspectionDialog(link);
+    });
+
+    inspectionDialog.querySelectorAll('[data-inspection-dialog-close]').forEach((button) => {
+        button.addEventListener('click', closeInspectionDialog);
+    });
+    inspectionDialog.addEventListener('click', (event) => {
+        if (event.target === inspectionDialog) closeInspectionDialog();
+    });
+    inspectionDialog.addEventListener('close', () => {
+        document.body.style.overflow = previousBodyOverflow;
+        const successState = inspectionDialog.querySelector('[data-async-success="inspection"]');
+        if (successState && !successState.hidden) successState.querySelector('[data-form-reset]')?.click();
+        const focusTarget = returnFocus?.closest('[data-menu-root]') ? menuOpen : returnFocus;
+        focusTarget?.focus();
+    });
+}
+
+document.querySelectorAll('[data-autoplay-preview]').forEach((video) => {
+    if (reducedMotion.matches) {
+        video.pause();
+        return;
+    }
+    video.play().catch(() => {});
 });

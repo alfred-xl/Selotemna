@@ -7,6 +7,7 @@ use App\Mail\InspectionRequestMail;
 use App\Models\InspectionRequest;
 use App\Support\SelotemnaContent;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +32,7 @@ class InspectionController extends Controller
         ]);
     }
 
-    public function store(StoreInspectionRequest $request): RedirectResponse
+    public function store(StoreInspectionRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
         $inspection = InspectionRequest::query()->firstOrCreate(
@@ -56,15 +57,26 @@ class InspectionController extends Controller
             $this->notifyStaff($inspection);
         }
 
+        $receipt = [
+            'reference' => $inspection->reference,
+            'project' => $inspection->project_name,
+            'preferred_date' => $inspection->preferred_date->format('j F Y'),
+            'preferred_time' => $inspection->preferred_time === 'No preference' || blank($inspection->preferred_time)
+                ? 'I’m flexible'
+                : $inspection->preferred_time,
+        ];
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Thanks! We got your inspection request. We will reply within 24 hours to confirm the next step.',
+                'receipt' => $receipt,
+            ], 201);
+        }
+
         return redirect()
             ->route('inspections.create')
-            ->with('status', 'Your inspection request has been received and saved. A Selotemna representative will follow up; this does not confirm an appointment.')
-            ->with('inspection_receipt', [
-                'reference' => $inspection->reference,
-                'project' => $inspection->project_name,
-                'preferred_date' => $inspection->preferred_date->format('j F Y'),
-                'preferred_time' => $inspection->preferred_time ?: 'No preference',
-            ]);
+            ->with('status', 'Thanks! We got your inspection request. We will reply within 24 hours to confirm the next step; this does not confirm an appointment.')
+            ->with('inspection_receipt', $receipt);
     }
 
     private function notifyStaff(InspectionRequest $inspection): void

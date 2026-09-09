@@ -9,10 +9,10 @@
 
 <div data-project-tabs>
     @if (count($groups) > 1)
-        <div class="overflow-x-auto pb-1" data-project-tab-scroll>
-            <div class="flex min-w-[17.5rem] border-b border-ink-200 sm:w-max sm:min-w-full" role="tablist" aria-label="Project stages">
+        <div class="border-b border-ink-200" data-project-tab-scroll>
+            <div class="grid grid-cols-3" role="tablist" aria-label="Project stages">
                 @foreach ($groups as $key => $group)
-                    <button type="button" id="{{ $idPrefix }}-tab-{{ $key }}" class="project-tab flex min-h-11 flex-1 shrink-0 items-center justify-center whitespace-nowrap px-2.5 py-3 text-sm font-semibold text-ink-800 focus-visible:ring-inset focus-visible:ring-offset-0 sm:flex-none sm:px-5" role="tab" aria-selected="{{ $loop->first ? 'true' : 'false' }}" aria-controls="{{ $idPrefix }}-panel-{{ $key }}" tabindex="{{ $loop->first ? '0' : '-1' }}" data-project-tab data-motion-button>{{ $group['label'] }}</button>
+                    <button type="button" id="{{ $idPrefix }}-tab-{{ $key }}" class="project-tab flex min-h-12 min-w-0 items-center justify-center px-1.5 py-3 text-[0.8125rem] font-semibold text-ink-800 focus-visible:ring-inset focus-visible:ring-offset-0 sm:px-5 sm:text-sm" role="tab" aria-selected="{{ $loop->first ? 'true' : 'false' }}" aria-controls="{{ $idPrefix }}-panel-{{ $key }}" tabindex="{{ $loop->first ? '0' : '-1' }}" data-project-tab data-motion-button>{{ $group['label'] }}</button>
                 @endforeach
             </div>
         </div>

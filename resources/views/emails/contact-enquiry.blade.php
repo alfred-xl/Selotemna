@@ -15,6 +15,8 @@
     <dd>{{ $enquiry->whatsapp ?: 'Not supplied' }}</dd>
     <dt>Preferred contact method</dt>
     <dd>{{ $enquiry->preferred_contact_method }}</dd>
+    <dt>Interested in</dt>
+    <dd>{{ $enquiry->interest_type }}</dd>
     <dt>Enquiry type</dt>
     <dd>{{ $enquiry->enquiry_type }}</dd>
     <dt>Project type</dt>

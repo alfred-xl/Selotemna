@@ -1,11 +1,11 @@
-@props(['property', 'contact'])
+@props(['property', 'contact', 'compact' => false])
 
 <section class="section-space bg-ink-50" data-home-omu-creek>
     <div class="site-container">
         <div class="grid items-start gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)] lg:gap-16" data-reveal-group>
             <div class="aspect-video min-w-0 overflow-hidden rounded-[1.5rem] border border-brand-100 bg-brand-950" data-reveal="media" data-omu-creek-media>
                 @if ($property['short_video_url'])
-                    <video class="h-full w-full bg-ink-950 object-contain" controls playsinline preload="metadata" @if ($property['short_video_poster']) poster="{{ $property['short_video_poster'] }}" @endif data-event="omu_creek_short_video_play" aria-label="Omu Creek property video preview">
+                    <video class="h-full w-full bg-ink-950 object-contain" controls autoplay muted playsinline preload="metadata" @if ($property['short_video_poster']) poster="{{ $property['short_video_poster'] }}" @endif data-autoplay-preview data-event="omu_creek_short_video_play" aria-label="Omu Creek property video preview">
                         <source src="{{ $property['short_video_url'] }}" type="video/mp4">
                         Your browser does not support embedded video. Visit the Omu Creek page for verified property information.
                     </video>
@@ -30,40 +30,32 @@
                 </dl>
             </div>
         </div>
-        <div class="mt-10 grid items-start gap-12 border-t border-ink-200 pt-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.95fr)] lg:gap-16" data-reveal-group>
-            <div data-reveal data-omu-creek-information>
-                <h3 class="text-2xl font-semibold leading-tight">Review the complete project information.</h3>
-                <p class="mt-4 max-w-xl text-base leading-7 text-ink-500">Understand the information available before making an enquiry or requesting an inspection.</p>
-                <ul class="mt-7 border-y border-ink-200" aria-label="Project information available">
-                    @foreach (['Payment terms and applicable charges', 'Documentation and allocation information', 'Infrastructure plans and project policies'] as $information)
-                        <li class="flex min-h-14 items-center gap-4 border-b border-ink-200 py-4 text-base font-semibold leading-6 text-ink-800 last:border-b-0">
-                            <span class="size-1.5 shrink-0 rounded-full bg-brand-700" aria-hidden="true"></span>
-                            <span>{{ $information }}</span>
-                        </li>
-                    @endforeach
-                </ul>
+        <div class="mt-10 border-t border-ink-200 pt-8" data-reveal data-omu-creek-actions>
+            @unless ($compact)
+                <details class="group max-w-3xl border-y border-ink-200" data-price-disclosure>
+                    <summary class="flex min-h-14 cursor-pointer list-none items-center justify-between gap-5 py-4 font-display text-lg font-semibold text-ink-950">
+                        View plot sizes and current outright prices
+                        <span class="text-2xl font-normal text-brand-700 transition-transform group-open:rotate-45" aria-hidden="true">+</span>
+                    </summary>
+                    <dl class="border-t border-ink-200 pb-2">
+                        @foreach (array_reverse($property['options']) as $option)
+                            <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-b border-ink-200 py-4 last:border-b-0">
+                                <dt class="font-semibold text-ink-800 tabular-nums">{{ number_format($option['size_sqm']) }} sqm</dt>
+                                <dd class="font-display text-lg font-semibold text-ink-950 tabular-nums">₦{{ number_format($option['price']) }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                    <p class="pb-5 text-[0.9375rem] leading-7 text-ink-500">{{ $property['disclaimer'] }}</p>
+                </details>
+            @endunless
+
+            <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap @unless($compact) mt-8 @endunless">
+                <x-site.button href="{{ route('inspections.create', ['interest' => $property['name']]) }}" class="w-full sm:w-auto" data-property-interest="{{ $property['name'] }}">Request an Omu Creek Inspection</x-site.button>
+                <x-site.button href="{{ route('omu-creek') }}" variant="secondary" class="w-full sm:w-auto">View Full Project Details</x-site.button>
             </div>
-            <div data-omu-creek-prices>
-                <h3 class="text-2xl font-semibold leading-tight">Current outright prices</h3>
-                <dl class="mt-5 border-t border-ink-200" data-reveal-group>
-                    @foreach (array_reverse($property['options']) as $option)
-                        <div class="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1 border-b border-ink-200 py-4" data-reveal>
-                            <dt class="font-semibold text-ink-800 tabular-nums">{{ number_format($option['size_sqm']) }} sqm</dt>
-                            <dd class="font-display text-lg font-semibold text-ink-950 tabular-nums">₦{{ number_format($option['price']) }}</dd>
-                        </div>
-                    @endforeach
-                </dl>
-                <p class="mt-5 text-[0.9375rem] leading-7 text-ink-500">{{ $property['disclaimer'] }}</p>
-                <div class="mt-8" data-omu-creek-actions>
-                    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                        <x-site.button href="{{ route('inspections.create', ['interest' => $property['name']]) }}" class="w-full sm:w-auto" data-property-interest="{{ $property['name'] }}">Request an Omu Creek Inspection</x-site.button>
-                        <x-site.button href="{{ route('omu-creek') }}" variant="secondary" class="w-full sm:w-auto">View Full Project Details</x-site.button>
-                    </div>
-                    @if ($contact['whatsapp_url'])
-                        <a href="{{ $contact['whatsapp_url'] }}" class="text-link mt-4" data-event="whatsapp_click">Ask on WhatsApp</a>
-                    @endif
-                </div>
-            </div>
+            @if ($contact['whatsapp_url'])
+                <a href="{{ $contact['whatsapp_url'] }}" class="text-link mt-4" data-event="whatsapp_click">Ask on WhatsApp</a>
+            @endif
         </div>
     </div>
 </section>

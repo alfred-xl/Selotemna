@@ -7,6 +7,7 @@ use App\Mail\ContactEnquiryMail;
 use App\Models\ContactEnquiry;
 use App\Support\SelotemnaContent;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -31,7 +32,7 @@ class ContactController extends Controller
         ]);
     }
 
-    public function store(StoreContactEnquiryRequest $request): RedirectResponse
+    public function store(StoreContactEnquiryRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
         $enquiry = ContactEnquiry::query()->firstOrCreate(
@@ -43,6 +44,7 @@ class ContactController extends Controller
                 'email' => $validated['email'] ?? null,
                 'whatsapp' => $validated['whatsapp'] ?? null,
                 'preferred_contact_method' => $validated['contact_method'],
+                'interest_type' => $validated['interest_type'],
                 'enquiry_type' => $validated['enquiry_type'],
                 'project_type' => $validated['project_type'] ?? null,
                 'proposed_location' => $validated['proposed_location'] ?? null,
@@ -57,14 +59,24 @@ class ContactController extends Controller
             $this->notifyStaff($enquiry);
         }
 
+        $receipt = [
+            'reference' => $enquiry->reference,
+            'interest_type' => $enquiry->interest_type,
+            'enquiry_type' => $enquiry->enquiry_type,
+            'contact_method' => $enquiry->preferred_contact_method,
+        ];
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Thanks! We got your message. We will reply within 24 hours.',
+                'receipt' => $receipt,
+            ], 201);
+        }
+
         return redirect()
             ->route('contact')
-            ->with('status', 'Your enquiry has been received and saved. A Selotemna representative will review it and contact you through your preferred method.')
-            ->with('contact_enquiry_receipt', [
-                'reference' => $enquiry->reference,
-                'enquiry_type' => $enquiry->enquiry_type,
-                'contact_method' => $enquiry->preferred_contact_method,
-            ]);
+            ->with('status', 'Thanks! We got your message. We will reply within 24 hours.')
+            ->with('contact_enquiry_receipt', $receipt);
     }
 
     private function notifyStaff(ContactEnquiry $enquiry): void

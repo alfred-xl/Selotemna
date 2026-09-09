@@ -61,6 +61,10 @@ return [
             'A discontinued transaction before full payment may qualify for a refund, subject to a 30% administrative and agency deduction. Refunds are typically processed within 60 days of the request.',
         ],
         'disclaimer' => 'Prices exclude applicable taxes. Availability and property information are subject to confirmation.',
+        'hero_image' => 'assets/images/omu-creek.png',
+        'hero_image_alt' => 'Aerial view of bridge construction over the Omu Creek waterway.',
+        'gallery_image' => 'assets/images/omu-creek-2.png',
+        'gallery_image_alt' => 'Closer aerial view of bridge construction over the Omu Creek waterway.',
         'video_url' => env('SELOTEMNA_OMU_CREEK_VIDEO_URL') ?: 'https://selotemna.boatengalfred.work/OMU%20CREEK%202%20VIDEO%201.mp4',
         'video_poster' => env('SELOTEMNA_OMU_CREEK_VIDEO_POSTER'),
         'short_video_url' => env('SELOTEMNA_OMU_CREEK_SHORT_VIDEO_URL') ?: 'https://selotemna.boatengalfred.work/SHORT%20FORM%201.mp4',
@@ -162,10 +166,8 @@ return [
             'alt' => 'A property professional speaking with clients during a viewing.',
         ],
         'contact' => [
-            'path' => 'assets/images/selotemna-contact-meeting.jpg',
-            'source_url' => 'https://www.pexels.com/photo/business-meeting-in-lagos-office-setting-30688596/',
-            'credit' => 'Photo by Ninthgrid on Pexels',
-            'alt' => 'Professionals discussing a project around a meeting table.',
+            'path' => 'assets/images/contact.jpg',
+            'alt' => 'A fabrication professional cutting metal in a workshop.',
         ],
     ],
 

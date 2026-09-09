@@ -7,9 +7,13 @@
 
         <title>{{ $title ?? 'Selotemna | Real Estate Development, Engineering & Construction' }}</title>
         <meta name="description" content="{{ $description ?? 'Explore Selotemna’s Real Estate Development and Engineering & Construction divisions and the Omu Creek Upcoming Project.' }}">
-        @unless (app()->environment('production'))
+        @if ($canonicalUrl ?? null)
+            <link rel="canonical" href="{{ $canonicalUrl }}">
+        @endif
+        @stack('structured-data')
+        @if (($isPreview ?? false) || ! app()->environment('production'))
             <meta name="robots" content="noindex, nofollow">
-        @endunless
+        @endif
 
         @fonts
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,5 +31,8 @@
         </main>
 
         <x-site.footer :contact="$contact" />
+        @unless (request()->routeIs('inspections.create'))
+            <x-site.inspection-dialog />
+        @endunless
     </body>
 </html>

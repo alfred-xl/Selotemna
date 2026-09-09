@@ -43,17 +43,33 @@ The site now provides:
 - `/real-estate-development/omu-creek` — verified Omu Creek detail
 - `/engineering-construction` — Engineering & Construction
 - `/projects` — Projects
+- `/projects/{slug}` — published project detail or signed administrator draft preview
 - `/book-inspection` — request-oriented Book Inspection
 - `/faq` — complete approved FAQ
 - `/contact` — configured contact channels and enquiry pathways
 
 The homepage is a concise overview that introduces the company and its two divisions, acknowledges its wider development history, features Omu Creek as the latest Upcoming Project, and routes visitors to dedicated pages.
 
-A generic Project Detail route is not implemented because verified project records and slugs have not been supplied.
+Generic project detail pages are generated from verified managed records. Omu Creek remains on its dedicated canonical route; `/projects/omu-creek` redirects there.
 
 ## Projects architecture
 
 Projects are now an important website content type.
+
+The repository now includes a normalized database-backed project content
+foundation for future administration. The main project record separates factual
+project stage from editorial publication state and relates to locations, media,
+plot options, payment plans, charges, document stages, infrastructure, policies,
+and grouped FAQs. Omu Creek has been imported into this model from the verified
+configuration source with its canonical path preserved.
+
+The public controllers now use the normalized project records as soon as any
+managed project exists. Only projects marked Published whose publication time
+has arrived are exposed; drafts, scheduled projects, and deleted projects do
+not fall back to legacy configuration. The established configuration remains a
+pre-import fallback for new environments. Run the Selotemna Omu Creek import
+command after migrations; it will not overwrite an existing record unless its
+force option is explicitly supplied.
 
 The Projects page always presents these stage tabs in this order:
 
@@ -63,7 +79,7 @@ The Projects page always presents these stage tabs in this order:
 
 These labels are factual statuses. Omu Creek is the current project with a detailed public record in the repository and is classified as an Upcoming Project. This publishing boundary must not be presented as the limit of Selotemna’s wider project history. Ongoing and Completed remain visible with honest empty states until approved records exist.
 
-A future generic Project Detail page should present only approved project information, media, scope, location, status, and actions appropriate to that project.
+The generic Project Detail page presents only the approved project information, media, scope, location, status, pricing, structured data, and actions saved on the managed record.
 
 ## Verified project data
 
@@ -181,7 +197,7 @@ Keep these foundations and the content hierarchy aligned in future changes.
 
 The active logo is public/assets/logo.png, a 189 × 153 transparent raster asset. Request a production SVG or higher-resolution transparent PNG before launch. Do not redraw or alter the wordmark.
 
-Two approved Omu Creek videos are served through the production custom domain `selotemna.boatengalfred.work`: a short preview in the Omu Creek feature and a detailed video on the dedicated Omu Creek page. Three approved editorial image placements use `selotemna-development-aerial.jpg`, `selotemna-earthworks-truck.jpg`, and `selotemna-building-construction.jpg` from `public/assets/images` when those files are present. Video poster images and accessible captions/transcripts remain outstanding.
+Two approved Omu Creek videos are served through the production custom domain `selotemna.boatengalfred.work`: a muted, controlled short preview that autoplays once in the Omu Creek feature and a user-initiated detailed video on the dedicated Omu Creek page. The short preview pauses for reduced-motion preferences and neither video loops. Three approved editorial image placements use `selotemna-development-aerial.jpg`, `selotemna-earthworks-truck.jpg`, and `selotemna-building-construction.jpg` from `public/assets/images` when those files are present. Video poster images and accessible captions/transcripts remain outstanding.
 
 Book Inspection and Contact use the local `selotemna-inspection-consultation.jpg` and `selotemna-contact-meeting.jpg` files downloaded from credited Pexels source pages retained in `config/selotemna.php`. Public captions identify them as editorial imagery. They must not be described as Selotemna staff, offices, projects or customers.
 
@@ -190,13 +206,12 @@ Testimonials are supported but remain hidden until a quote, public name, relevan
 ## Decisions still required
 
 1. Status definitions and approval criteria for future Ongoing and Completed projects
-2. Generic Project Detail field requirements beyond Omu Creek
-3. Real Estate Development inventory model beyond Omu Creek
-4. Detailed Engineering & Construction scope and enquiry fields
-5. Property Management scope and placement
-6. Verified company WhatsApp number, office address, business hours, and operating locations
-7. Commercial-use confirmation and source files for the three supplied editorial images
-8. Approved testimonial quotations, identities, service relevance and publication permission
-9. Omu Creek video posters and accessible captions/transcripts
-10. Inspection-request privacy notice, retention period and deletion process
-11. Future staff handling method for saved inspection requests and contact enquiries beyond database records and optional email notification
+2. Real Estate Development inventory policy beyond the current project records
+3. Detailed Engineering & Construction scope and enquiry fields
+4. Property Management scope and placement
+5. Verified company WhatsApp number, office address, business hours, and operating locations
+6. Commercial-use confirmation and source files for the three supplied editorial images
+7. Approved testimonial quotations, identities, service relevance and publication permission
+8. Omu Creek video posters and accessible captions/transcripts
+9. Inspection-request privacy notice, retention period and deletion process
+10. Future staff handling method for saved inspection requests and contact enquiries beyond database records and optional email notification

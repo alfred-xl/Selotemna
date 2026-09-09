@@ -17,8 +17,8 @@
                 @if ($receipt)
                     <div class="rounded-[1.5rem] border border-brand-100 bg-brand-50 p-6 md:p-9" role="status" data-inspection-receipt data-reveal>
                         <span class="eyebrow">Request received</span>
-                        <h2 class="text-3xl font-semibold md:text-4xl">Your request has been saved.</h2>
-                        <p class="mt-5 max-w-2xl leading-7 text-ink-500">A Selotemna representative will review your preferred date and contact you about availability. This receipt does not confirm an inspection appointment.</p>
+                        <h2 class="text-3xl font-semibold md:text-4xl">Thanks! We got your inspection request.</h2>
+                        <p class="mt-5 max-w-2xl leading-7 text-ink-500">We will reply within 24 hours to confirm the next step. This receipt does not confirm an inspection appointment.</p>
                         <p class="mt-3 font-semibold text-ink-950">Keep this reference for follow-up.</p>
 
                         <dl class="mt-8 border-y border-brand-100 px-1 md:px-2">
@@ -34,7 +34,7 @@
                         </div>
                     </div>
                 @else
-                    <form method="POST" action="{{ route('inspections.store') }}" class="rounded-[1.5rem] border border-ink-200 bg-ink-50 p-6 md:p-8" data-inspection-form data-submit-once data-reveal novalidate>
+                    <form method="POST" action="{{ route('inspections.store') }}" class="rounded-[1.5rem] border border-ink-200 bg-ink-50 p-6 md:p-8" data-inspection-form data-submit-once data-async-form="inspection" data-step-form data-reveal novalidate>
                         @csrf
                         <input id="submission_token" type="hidden" name="submission_token" value="{{ $submissionToken }}">
                         <input id="interest" type="hidden" name="interest" value="Omu Creek">
@@ -52,6 +52,12 @@
                             </a>
                         </div>
 
+                        <div class="mt-7" data-step-progress hidden>
+                            <div class="flex items-center justify-between gap-4 text-sm font-bold text-ink-500"><span data-step-label>Step 1 of 3</span><span data-step-name>Inspection preference</span></div>
+                            <div class="mt-3 h-1.5 overflow-hidden rounded-full bg-brand-100"><span class="block h-full rounded-full bg-brand-700 transition-[width]" data-step-progress-bar></span></div>
+                        </div>
+                        <div class="form-message mt-7" role="alert" tabindex="-1" data-async-error-summary hidden></div>
+
                         @if ($errors->any())
                             <div id="inspection_error_summary" class="mt-7 rounded-xl border border-brand-500 bg-white px-5 py-4" role="alert" tabindex="-1" data-form-error-summary>
                                 <h3 class="text-base font-semibold">Check the highlighted fields.</h3>
@@ -65,22 +71,22 @@
                             </div>
                         @endif
 
-                        <fieldset class="mt-8">
+                        <fieldset class="mt-8" data-form-step="2" data-step-title="Contact details">
                             <legend class="w-full border-b border-ink-200 pb-3 font-display text-xl font-semibold text-ink-950">Contact details</legend>
                             <div class="mt-6 grid gap-6 md:grid-cols-2">
                                 <div class="md:col-span-2">
                                     <label for="full_name" class="form-label">Full name <span aria-hidden="true">*</span></label>
-                                    <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" autocomplete="name" class="form-control" required @error('full_name') aria-describedby="full_name_error" aria-invalid="true" @enderror>
+                                    <input id="full_name" name="full_name" type="text" value="{{ old('full_name') }}" autocomplete="name" class="form-control" required data-required-message="Please enter your full name." @error('full_name') aria-describedby="full_name_error" aria-invalid="true" @enderror>
                                     @error('full_name') <p id="full_name_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label for="phone" class="form-label">Telephone number <span aria-hidden="true">*</span></label>
-                                    <input id="phone" name="phone" type="tel" value="{{ old('phone') }}" autocomplete="tel" class="form-control" inputmode="tel" required @error('phone') aria-describedby="phone_error" aria-invalid="true" @enderror>
+                                    <input id="phone" name="phone" type="tel" value="{{ old('phone') }}" autocomplete="tel" class="form-control" inputmode="tel" minlength="7" required data-required-message="Please enter your telephone number." data-invalid-message="Please enter a valid telephone number." @error('phone') aria-describedby="phone_error" aria-invalid="true" @enderror>
                                     @error('phone') <p id="phone_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label for="contact_method" class="form-label">Preferred contact method <span aria-hidden="true">*</span></label>
-                                    <select id="contact_method" name="contact_method" class="form-control" required data-contact-method @error('contact_method') aria-describedby="contact_method_error" aria-invalid="true" @enderror>
+                                    <select id="contact_method" name="contact_method" class="form-control" required data-contact-method data-required-message="Please choose how you would like us to contact you." @error('contact_method') aria-describedby="contact_method_error" aria-invalid="true" @enderror>
                                         <option value="">Select a contact method</option>
                                         @foreach (['Telephone', 'WhatsApp', 'Email'] as $method)
                                             <option value="{{ $method }}" @selected(old('contact_method') === $method)>{{ $method }}</option>
@@ -88,20 +94,20 @@
                                     </select>
                                     @error('contact_method') <p id="contact_method_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
-                                <div>
+                                <div data-conditional-contact-group="WhatsApp">
                                     <label for="whatsapp" class="form-label">WhatsApp number <span id="whatsapp_requirement" class="font-normal text-ink-500" data-contact-requirement data-method="WhatsApp">(required when WhatsApp is selected)</span></label>
-                                    <input id="whatsapp" name="whatsapp" type="tel" value="{{ old('whatsapp') }}" autocomplete="tel" class="form-control" inputmode="tel" aria-describedby="whatsapp_requirement @error('whatsapp') whatsapp_error @enderror" data-conditional-contact="WhatsApp" @error('whatsapp') aria-invalid="true" @enderror>
+                                    <input id="whatsapp" name="whatsapp" type="tel" value="{{ old('whatsapp') }}" autocomplete="tel" class="form-control" inputmode="tel" minlength="7" aria-describedby="whatsapp_requirement @error('whatsapp') whatsapp_error @enderror" data-conditional-contact="WhatsApp" data-required-message="Please enter your WhatsApp number." data-invalid-message="Please enter a valid WhatsApp number." @error('whatsapp') aria-invalid="true" @enderror>
                                     @error('whatsapp') <p id="whatsapp_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
-                                <div>
+                                <div data-conditional-contact-group="Email">
                                     <label for="email" class="form-label">Email address <span id="email_requirement" class="font-normal text-ink-500" data-contact-requirement data-method="Email">(required when Email is selected)</span></label>
-                                    <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" class="form-control" aria-describedby="email_requirement @error('email') email_error @enderror" data-conditional-contact="Email" @error('email') aria-invalid="true" @enderror>
+                                    <input id="email" name="email" type="email" value="{{ old('email') }}" autocomplete="email" class="form-control" aria-describedby="email_requirement @error('email') email_error @enderror" data-conditional-contact="Email" data-required-message="Please enter your email address." data-invalid-message="Please enter a valid email address." @error('email') aria-invalid="true" @enderror>
                                     @error('email') <p id="email_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
                             </div>
                         </fieldset>
 
-                        <fieldset class="mt-10">
+                        <fieldset class="mt-10" data-form-step="1" data-step-title="Inspection preference">
                             <legend class="w-full border-b border-ink-200 pb-3 font-display text-xl font-semibold text-ink-950">Inspection preference</legend>
                             <dl class="grid gap-1 border-b border-ink-200 py-5 sm:grid-cols-[9rem_1fr] sm:gap-5">
                                 <dt class="text-sm font-bold text-ink-500">Opportunity</dt>
@@ -110,23 +116,23 @@
                             <div class="mt-6 grid gap-6 md:grid-cols-2">
                                 <div>
                                     <label for="preferred_date" class="form-label">Preferred date <span aria-hidden="true">*</span></label>
-                                    <input id="preferred_date" name="preferred_date" type="date" min="{{ now()->toDateString() }}" value="{{ old('preferred_date') }}" class="form-control" required @error('preferred_date') aria-describedby="preferred_date_error" aria-invalid="true" @enderror>
+                                    <input id="preferred_date" name="preferred_date" type="date" min="{{ now()->toDateString() }}" value="{{ old('preferred_date') }}" class="form-control" required data-required-message="Please choose a preferred inspection date." @error('preferred_date') aria-describedby="preferred_date_error" aria-invalid="true" @enderror>
                                     @error('preferred_date') <p id="preferred_date_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
                                 <div>
                                     <label for="preferred_time" class="form-label">Preferred period <span class="font-normal text-ink-500">(optional)</span></label>
                                     <select id="preferred_time" name="preferred_time" class="form-control" @error('preferred_time') aria-describedby="preferred_time_error" aria-invalid="true" @enderror>
                                         <option value="">Select a period</option>
-                                        @foreach (['Morning', 'Afternoon', 'No preference'] as $period)
-                                            <option value="{{ $period }}" @selected(old('preferred_time') === $period)>{{ $period }}</option>
-                                        @endforeach
+                                        <option value="Morning" @selected(old('preferred_time') === 'Morning')>Morning</option>
+                                        <option value="Afternoon" @selected(old('preferred_time') === 'Afternoon')>Afternoon</option>
+                                        <option value="No preference" @selected(old('preferred_time') === 'No preference')>I’m flexible</option>
                                     </select>
                                     @error('preferred_time') <p id="preferred_time_error" class="form-error">{{ $message }}</p> @enderror
                                 </div>
                             </div>
                         </fieldset>
 
-                        <fieldset class="mt-10">
+                        <fieldset class="mt-10" data-form-step="3" data-step-title="Review and submit">
                             <legend class="w-full border-b border-ink-200 pb-3 font-display text-xl font-semibold text-ink-950">Additional information</legend>
                             <div class="mt-6">
                                 <label for="message" class="form-label">Message <span class="font-normal text-ink-500">(optional)</span></label>
@@ -136,11 +142,11 @@
                             </div>
                         </fieldset>
 
-                        <fieldset class="mt-10">
+                        <fieldset class="mt-10" data-form-step="3" data-step-title="Review and submit">
                             <legend class="w-full border-b border-ink-200 pb-3 font-display text-xl font-semibold text-ink-950">Consent and submission</legend>
                             <div class="mt-6">
                                 <label class="flex items-start gap-3 leading-7 text-ink-800" for="consent">
-                                    <input id="consent" name="consent" type="checkbox" value="1" class="mt-1 size-5 shrink-0 accent-brand-700 @error('consent') outline-2 outline-offset-2 outline-brand-700 @enderror" @checked(old('consent')) required @error('consent') aria-describedby="consent_error" aria-invalid="true" @enderror>
+                                    <input id="consent" name="consent" type="checkbox" value="1" class="mt-1 size-5 shrink-0 accent-brand-700 @error('consent') outline-2 outline-offset-2 outline-brand-700 @enderror" @checked(old('consent')) required data-required-message="Please acknowledge that this is an inspection request, not a confirmed appointment." @error('consent') aria-describedby="consent_error" aria-invalid="true" @enderror>
                                     <span>I understand that my details will be used to review and respond to this request, and that submitting it does not automatically confirm an inspection appointment. <span aria-hidden="true">*</span></span>
                                 </label>
                                 @error('consent') <p id="consent_error" class="form-error">{{ $message }}</p> @enderror
@@ -152,6 +158,18 @@
                             <span class="sr-only" aria-live="polite" data-submit-status></span>
                         </fieldset>
                     </form>
+                    <div class="rounded-[1.5rem] border border-brand-100 bg-brand-50 p-6 md:p-9" role="status" tabindex="-1" data-async-success="inspection" hidden>
+                        <span class="eyebrow">Request received</span>
+                        <h2 class="text-3xl font-semibold md:text-4xl">Thanks! We got your inspection request.</h2>
+                        <p class="mt-5 max-w-2xl leading-7 text-ink-500" data-success-message>We will reply within 24 hours to confirm the next step.</p>
+                        <dl class="mt-8 border-y border-brand-100">
+                            <div class="summary-row"><dt>Reference</dt><dd class="font-mono text-brand-800" data-success-reference></dd></div>
+                            <div class="summary-row"><dt>Preferred date</dt><dd data-success-date></dd></div>
+                            <div class="summary-row"><dt>Time of day</dt><dd data-success-time></dd></div>
+                        </dl>
+                        <p class="mt-5 text-sm leading-6 text-ink-500">Your request is saved, but it is not yet a confirmed appointment.</p>
+                        <button type="button" class="mt-8 inline-flex min-h-12 items-center justify-center rounded-xl border border-ink-200 bg-white px-5 py-3 text-sm font-semibold hover:border-brand-700" data-form-reset>Submit another request</button>
+                    </div>
                 @endif
             </div>
 
