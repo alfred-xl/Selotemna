@@ -139,6 +139,11 @@ class Project extends Model
         return $this->hasMany(ProjectPlotOption::class)->orderBy('sort_order');
     }
 
+    public function paymentReceipts(): HasMany
+    {
+        return $this->hasMany(PaymentReceipt::class);
+    }
+
     public function paymentPlan(): HasOne
     {
         return $this->hasOne(ProjectPaymentPlan::class);

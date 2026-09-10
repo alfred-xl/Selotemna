@@ -8,10 +8,13 @@
 @php
     $prefix = $modal ? 'project_modal_' : 'project_';
     $plotOptions = collect($property['options'] ?? [])->sortBy('size_sqm');
+    $pricePerSqm = (int) ($property['price_per_sqm'] ?? 0);
+    $currency = $property['currency'] ?? 'NGN';
+    $usesCustomSize = old('plot_option') === 'custom';
 @endphp
 
 <div data-project-enquiry-flow>
-    <form method="POST" action="{{ route('project-enquiries.store') }}" @class(['mt-7' => $modal, 'rounded-[1.5rem] border border-ink-200 bg-ink-50 p-6 md:p-8' => ! $modal]) data-project-enquiry-form data-submit-once data-async-form="project-enquiry" data-step-form novalidate @if($receipt) hidden @endif>
+    <form method="POST" action="{{ route('project-enquiries.store') }}" @class(['mt-7' => $modal, 'rounded-[1.5rem] border border-ink-200 bg-ink-50 p-6 md:p-8' => ! $modal]) data-project-enquiry-form data-submit-once data-async-form="project-enquiry" data-step-form data-price-per-sqm="{{ $pricePerSqm }}" data-price-currency="{{ $currency }}" novalidate @if($receipt) hidden @endif>
         @csrf
         <input type="hidden" name="submission_token" value="{{ $submissionToken }}" data-submission-token>
         <div class="absolute -left-[10000px] top-auto size-px overflow-hidden" aria-hidden="true">
@@ -39,18 +42,42 @@
         <fieldset data-form-step="1" data-step-title="Plot preference">
             <legend class="font-display text-xl font-semibold">Which plot are you interested in?</legend>
             <p class="mt-2 text-sm leading-6 text-ink-500">Selecting an option does not reserve a plot. Availability will be confirmed by the team.</p>
-            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="mt-5 grid gap-3 sm:grid-cols-2" role="radiogroup" aria-label="Plot size options">
                 @foreach ($plotOptions as $option)
                     @php $size = (string) (int) $option['size_sqm']; @endphp
                     <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-ink-200 bg-white p-4 has-checked:border-brand-700 has-checked:ring-1 has-checked:ring-brand-700">
-                        <input name="plot_option" type="radio" value="{{ $size }}" class="mt-1 size-4 shrink-0 accent-brand-700" required data-required-message="Please choose a plot size or select Not sure yet." @checked(old('plot_option') === $size)>
+                        <input name="plot_option" type="radio" value="{{ $size }}" class="mt-1 size-4 shrink-0 accent-brand-700" required data-plot-size="{{ $size }}" data-plot-price="{{ (int) $option['price'] }}" data-required-message="Please choose a plot size, Custom size, or Not sure yet." @checked(old('plot_option') === $size)>
                         <span><strong class="block text-ink-950">{{ number_format($option['size_sqm']) }} sqm</strong><span class="mt-1 block text-sm text-ink-500">{{ $option['label'] }} · ₦{{ number_format($option['price']) }}</span></span>
                     </label>
                 @endforeach
                 <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-ink-200 bg-white p-4 has-checked:border-brand-700 has-checked:ring-1 has-checked:ring-brand-700">
-                    <input name="plot_option" type="radio" value="unsure" class="mt-1 size-4 shrink-0 accent-brand-700" required data-required-message="Please choose a plot size or select Not sure yet." @checked(old('plot_option') === 'unsure')>
+                    <input name="plot_option" type="radio" value="custom" class="mt-1 size-4 shrink-0 accent-brand-700" required data-custom-plot-option data-required-message="Please choose a plot size, Custom size, or Not sure yet." @checked($usesCustomSize)>
+                    <span><strong class="block text-ink-950">Custom size</strong><span class="mt-1 block text-sm text-ink-500">Enter any preferred whole-number size.</span></span>
+                </label>
+                <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-ink-200 bg-white p-4 has-checked:border-brand-700 has-checked:ring-1 has-checked:ring-brand-700">
+                    <input name="plot_option" type="radio" value="unsure" class="mt-1 size-4 shrink-0 accent-brand-700" required data-required-message="Please choose a plot size, Custom size, or Not sure yet." @checked(old('plot_option') === 'unsure')>
                     <span><strong class="block text-ink-950">Not sure yet</strong><span class="mt-1 block text-sm text-ink-500">Let the team help you compare options.</span></span>
                 </label>
+            </div>
+
+            <div class="mt-5 rounded-xl border border-ink-200 bg-white p-5" data-custom-plot-field @if (! $usesCustomSize) hidden @endif>
+                <label for="{{ $prefix }}custom_plot_size_sqm" class="form-label">Preferred custom size <span aria-hidden="true">*</span></label>
+                <div class="relative max-w-sm">
+                    <input id="{{ $prefix }}custom_plot_size_sqm" name="custom_plot_size_sqm" type="number" step="1" inputmode="numeric" value="{{ old('custom_plot_size_sqm') }}" class="form-control pr-16" data-custom-plot-size data-required-message="Please enter your preferred custom plot size." data-invalid-message="Please enter a positive whole-number plot size." @if ($usesCustomSize) required @else disabled @endif>
+                    <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-sm font-semibold text-ink-500">sqm</span>
+                </div>
+                <p class="mt-2 text-sm leading-6 text-ink-500">Enter any whole number greater than zero. The team will confirm whether that size can be allocated.</p>
+            </div>
+
+            <div class="mt-5 rounded-xl border border-brand-100 bg-brand-50 p-5" role="status" aria-live="polite" data-plot-estimate hidden>
+                <p class="text-xs font-bold uppercase tracking-[0.14em] text-brand-700">Estimated base land price</p>
+                <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div><dt class="text-ink-500">Preferred size</dt><dd class="mt-1 font-semibold text-ink-950" data-estimate-size></dd></div>
+                    <div><dt class="text-ink-500">Current rate</dt><dd class="mt-1 font-semibold text-ink-950" data-estimate-rate></dd></div>
+                </dl>
+                <p class="mt-4 text-2xl font-semibold text-brand-950" data-estimate-price></p>
+                <p class="mt-2 text-sm text-ink-500" data-estimate-formula></p>
+                <p class="mt-4 border-t border-brand-100 pt-4 text-sm leading-6 text-ink-500">This is a base-price estimate, not an offer or reservation. Availability, taxes, statutory charges, survey fees and development levies remain subject to confirmation.</p>
             </div>
 
             <div class="mt-6 grid gap-5 sm:grid-cols-2">
@@ -126,6 +153,8 @@
         <dl class="mt-6 border-y border-brand-100">
             <div class="summary-row"><dt>Reference</dt><dd class="font-mono" data-success-reference>{{ $receipt['reference'] ?? '' }}</dd></div>
             <div class="summary-row"><dt>Plot preference</dt><dd data-success-plot>{{ $receipt['plot'] ?? '' }}</dd></div>
+            <div class="summary-row"><dt>Rate when submitted</dt><dd data-success-rate>@if ($receipt['rate_per_sqm'] ?? null){{ ($receipt['currency'] ?? 'NGN') === 'NGN' ? '₦' : ($receipt['currency'].' ') }}{{ number_format($receipt['rate_per_sqm']) }} per sqm @else Not selected @endif</dd></div>
+            <div class="summary-row"><dt>Estimated base price</dt><dd data-success-estimate>@if ($receipt['estimated_price'] ?? null){{ ($receipt['currency'] ?? 'NGN') === 'NGN' ? '₦' : ($receipt['currency'].' ') }}{{ number_format($receipt['estimated_price']) }} @else Not selected @endif</dd></div>
             <div class="summary-row"><dt>Timeline</dt><dd data-success-timeline>{{ $receipt['timeline'] ?? '' }}</dd></div>
         </dl>
         <p class="mt-5 text-sm leading-6 text-ink-500">Plot availability and pricing remain subject to confirmation.</p>

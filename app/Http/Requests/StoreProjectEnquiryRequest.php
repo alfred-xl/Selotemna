@@ -18,12 +18,13 @@ class StoreProjectEnquiryRequest extends FormRequest
         $plotOptions = collect(app(SelotemnaContent::class)->project('omu-creek')['options'] ?? [])
             ->pluck('size_sqm')
             ->map(fn (mixed $size): string => (string) (int) $size)
-            ->push('unsure')
+            ->push('custom', 'unsure')
             ->all();
 
         return [
             'submission_token' => ['required', 'uuid'],
             'plot_option' => ['required', Rule::in($plotOptions)],
+            'custom_plot_size_sqm' => ['nullable', 'required_if:plot_option,custom', 'integer', 'gt:0'],
             'payment_preference' => ['required', Rule::in(['Outright', 'Instalment', 'Not decided'])],
             'purchase_timeline' => ['required', Rule::in(['Immediately', '1–3 months', '3–6 months', 'Researching'])],
             'full_name' => ['required', 'string', 'max:120'],
@@ -40,6 +41,9 @@ class StoreProjectEnquiryRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'custom_plot_size_sqm.required_if' => 'Please enter your preferred custom plot size.',
+            'custom_plot_size_sqm.integer' => 'Please enter the custom plot size as a whole number.',
+            'custom_plot_size_sqm.gt' => 'Please enter a custom plot size greater than zero.',
             'plot_option.required' => 'Please choose a plot size or select “Not sure yet”.',
             'plot_option.in' => 'Please choose one of the currently published plot options.',
             'payment_preference.required' => 'Please choose a payment preference.',

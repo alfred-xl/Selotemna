@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\ProjectEnquiries;
 
+use App\Filament\Resources\PaymentReceipts\PaymentReceiptResource;
 use App\Filament\Resources\ProjectEnquiries\Pages\EditProjectEnquiry;
 use App\Filament\Resources\ProjectEnquiries\Pages\ListProjectEnquiries;
 use App\Filament\Resources\ProjectEnquiries\Pages\ViewProjectEnquiry;
 use App\Models\ProjectEnquiry;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
@@ -79,7 +81,9 @@ class ProjectEnquiryResource extends Resource
                     TextInput::make('reference')->disabled(),
                     TextInput::make('project_name')->disabled(),
                     TextInput::make('plot_label')->disabled(),
-                    TextInput::make('price_snapshot')->label('Price when submitted')->prefix('₦')->disabled(),
+                    TextInput::make('plot_size_sqm')->label('Requested size')->suffix('sqm')->disabled(),
+                    TextInput::make('price_per_sqm_snapshot')->label('Rate when submitted')->prefix('₦')->suffix('per sqm')->disabled(),
+                    TextInput::make('price_snapshot')->label('Estimated base price')->prefix('₦')->disabled(),
                     TextInput::make('payment_preference')->disabled(),
                     TextInput::make('purchase_timeline')->disabled(),
                     TextInput::make('full_name')->disabled(),
@@ -103,7 +107,9 @@ class ProjectEnquiryResource extends Resource
                     TextEntry::make('created_at')->label('Received')->dateTime('j M Y, g:i a'),
                     TextEntry::make('project_name'),
                     TextEntry::make('plot_label'),
-                    TextEntry::make('price_snapshot')->label('Price when submitted')->money('NGN')->placeholder('Not selected'),
+                    TextEntry::make('plot_size_sqm')->label('Requested size')->suffix(' sqm')->placeholder('Not selected'),
+                    TextEntry::make('price_per_sqm_snapshot')->label('Rate when submitted')->money('NGN')->suffix(' per sqm')->placeholder('Not selected'),
+                    TextEntry::make('price_snapshot')->label('Estimated base price')->money('NGN')->placeholder('Not selected'),
                     TextEntry::make('payment_preference'),
                     TextEntry::make('purchase_timeline'),
                     TextEntry::make('preferred_contact_method'),
@@ -131,7 +137,13 @@ class ProjectEnquiryResource extends Resource
             ->columns([
                 TextColumn::make('reference')->searchable()->copyable()->weight('medium'),
                 TextColumn::make('full_name')->label('Contact')->searchable()->description(fn (ProjectEnquiry $record): string => $record->phone),
-                TextColumn::make('plot_label')->label('Plot preference')->searchable(),
+                TextColumn::make('plot_label')
+                    ->label('Plot preference')
+                    ->searchable()
+                    ->description(fn (ProjectEnquiry $record): ?string => $record->price_snapshot
+                        ? '₦'.number_format($record->price_snapshot).' estimate · ₦'.number_format($record->price_per_sqm_snapshot).' per sqm'
+                        : null)
+                    ->wrap(),
                 TextColumn::make('payment_preference')->badge(),
                 TextColumn::make('purchase_timeline')->label('Timeline'),
                 TextColumn::make('status')
@@ -157,6 +169,10 @@ class ProjectEnquiryResource extends Resource
                 ]),
             ])
             ->recordActions([
+                Action::make('generateReceipt')
+                    ->label('Generate e-receipt')
+                    ->icon('heroicon-o-document-currency-dollar')
+                    ->url(fn (ProjectEnquiry $record): string => PaymentReceiptResource::getUrl('create', ['project_enquiry' => $record->getKey()])),
                 ViewAction::make(),
                 EditAction::make(),
             ])

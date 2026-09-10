@@ -43,6 +43,23 @@ class ProjectEnquiryController extends Controller
         $option = collect($property['options'] ?? [])->first(
             fn (array $item): bool => (string) (int) $item['size_sqm'] === $validated['plot_option'],
         );
+        $isCustomSize = $validated['plot_option'] === 'custom';
+        $plotSize = match (true) {
+            $isCustomSize => (int) $validated['custom_plot_size_sqm'],
+            $option !== null => (int) $option['size_sqm'],
+            default => null,
+        };
+        $pricePerSqm = (int) ($property['price_per_sqm'] ?? 0);
+        $priceSnapshot = match (true) {
+            $isCustomSize => $plotSize * $pricePerSqm,
+            $option !== null => (int) $option['price'],
+            default => null,
+        };
+        $plotLabel = match (true) {
+            $isCustomSize => number_format($plotSize).' sqm — Custom size request',
+            $option !== null => number_format($option['size_sqm']).' sqm — '.$option['label'],
+            default => 'Not sure yet',
+        };
 
         $project = Project::query()->published()->where('slug', 'omu-creek')->first();
         $enquiry = ProjectEnquiry::query()->firstOrCreate(
@@ -52,9 +69,9 @@ class ProjectEnquiryController extends Controller
                 'status' => ProjectEnquiry::STATUS_NEW,
                 'project_slug' => 'omu-creek',
                 'project_name' => $property['name'],
-                'plot_size_sqm' => $option ? (int) $option['size_sqm'] : null,
-                'plot_label' => $option ? number_format($option['size_sqm']).' sqm — '.$option['label'] : 'Not sure yet',
-                'price_snapshot' => $option['price'] ?? null,
+                'plot_size_sqm' => $plotSize,
+                'plot_label' => $plotLabel,
+                'price_snapshot' => $priceSnapshot,
                 'currency' => $option['currency'] ?? $property['currency'] ?? 'NGN',
                 'payment_preference' => $validated['payment_preference'],
                 'purchase_timeline' => $validated['purchase_timeline'],
@@ -76,6 +93,9 @@ class ProjectEnquiryController extends Controller
             'reference' => $enquiry->reference,
             'project' => $enquiry->project_name,
             'plot' => $enquiry->plot_label,
+            'rate_per_sqm' => $enquiry->price_per_sqm_snapshot,
+            'estimated_price' => $enquiry->price_snapshot,
+            'currency' => $enquiry->currency,
             'timeline' => $enquiry->purchase_timeline,
         ];
 

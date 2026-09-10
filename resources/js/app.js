@@ -562,6 +562,23 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
     const submitLabel = submitButton?.querySelector('[data-submit-label]');
     const submitStatus = form.querySelector('[data-submit-status]');
     const originalSubmitLabel = submitLabel?.textContent;
+    const priceCurrency = form.dataset.priceCurrency ?? 'NGN';
+
+    const formatMoney = (value, currency = priceCurrency) => {
+        const amount = Number(value);
+        if (!Number.isFinite(amount)) return '';
+
+        try {
+            return new Intl.NumberFormat('en-NG', {
+                style: 'currency',
+                currency,
+                currencyDisplay: 'narrowSymbol',
+                maximumFractionDigits: 0,
+            }).format(amount);
+        } catch {
+            return `${currency} ${new Intl.NumberFormat('en-NG', { maximumFractionDigits: 0 }).format(amount)}`;
+        }
+    };
 
     const fieldErrorElement = (field) => {
         const errorId = field.id ? `${field.id}_error` : `${formKind ?? 'form'}_${field.name}_error`;
@@ -687,6 +704,50 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
 
     enquiryType?.addEventListener('change', updateEngineeringFields);
     updateEngineeringFields();
+
+    const plotOptions = [...form.querySelectorAll('[name="plot_option"]')];
+    const customPlotField = form.querySelector('[data-custom-plot-field]');
+    const customPlotInput = form.querySelector('[data-custom-plot-size]');
+    const plotEstimate = form.querySelector('[data-plot-estimate]');
+    const pricePerSqm = Number(form.dataset.pricePerSqm);
+
+    const updatePlotEstimate = () => {
+        if (!customPlotField || !customPlotInput || !plotEstimate) return;
+
+        const selectedOption = plotOptions.find((option) => option.checked);
+        const isCustomSize = selectedOption?.value === 'custom';
+        const customValue = customPlotInput.value.trim();
+        const customSizeIsValid = /^\d+$/.test(customValue) && Number(customValue) > 0;
+
+        customPlotField.hidden = !isCustomSize;
+        customPlotField.setAttribute('aria-hidden', isCustomSize ? 'false' : 'true');
+        customPlotInput.disabled = !isCustomSize;
+        customPlotInput.required = isCustomSize;
+        customPlotInput.setCustomValidity(isCustomSize && customValue && !customSizeIsValid ? 'Please enter a positive whole-number plot size.' : '');
+
+        const size = isCustomSize && customSizeIsValid
+            ? Number(customValue)
+            : Number(selectedOption?.dataset.plotSize);
+        const publishedOptionPrice = Number(selectedOption?.dataset.plotPrice);
+        const estimatedPrice = Number.isFinite(publishedOptionPrice) && publishedOptionPrice > 0
+            ? publishedOptionPrice
+            : size * pricePerSqm;
+        const hasEstimate = Number.isFinite(size) && size > 0 && Number.isFinite(estimatedPrice) && estimatedPrice > 0 && pricePerSqm > 0;
+
+        plotEstimate.hidden = !hasEstimate;
+        if (!hasEstimate) return;
+
+        const formattedSize = new Intl.NumberFormat('en-NG', { maximumFractionDigits: 0 }).format(size);
+        const formattedRate = formatMoney(pricePerSqm);
+        plotEstimate.querySelector('[data-estimate-size]').textContent = `${formattedSize} sqm`;
+        plotEstimate.querySelector('[data-estimate-rate]').textContent = `${formattedRate} per sqm`;
+        plotEstimate.querySelector('[data-estimate-price]').textContent = formatMoney(estimatedPrice);
+        plotEstimate.querySelector('[data-estimate-formula]').textContent = `${formattedSize} sqm × ${formattedRate} per sqm`;
+    };
+
+    plotOptions.forEach((option) => option.addEventListener('change', updatePlotEstimate));
+    customPlotInput?.addEventListener('input', updatePlotEstimate);
+    updatePlotEstimate();
 
     const stepElements = [...form.querySelectorAll('[data-form-step]')];
     const stepNumbers = [...new Set(stepElements.map((step) => Number(step.dataset.formStep)))].sort((a, b) => a - b);
@@ -828,6 +889,8 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
         assign('[data-success-interest]', receipt.interest_type);
         assign('[data-success-enquiry]', receipt.enquiry_type);
         assign('[data-success-plot]', receipt.plot);
+        assign('[data-success-rate]', receipt.rate_per_sqm ? `${formatMoney(receipt.rate_per_sqm, receipt.currency)} per sqm` : 'Not selected');
+        assign('[data-success-estimate]', receipt.estimated_price ? formatMoney(receipt.estimated_price, receipt.currency) : 'Not selected');
         assign('[data-success-timeline]', receipt.timeline);
         form.hidden = true;
         successState.hidden = false;
@@ -899,6 +962,7 @@ document.querySelectorAll('[data-submit-once]').forEach((form) => {
         form.hidden = false;
         updateConditionalContactFields();
         updateEngineeringFields();
+        updatePlotEstimate();
         activateStep(0, { focus: true });
     });
 });

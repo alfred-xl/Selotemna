@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AboutController;
+use App\Http\Controllers\Admin\PaymentReceiptDocumentController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\EngineeringConstructionController;
 use App\Http\Controllers\FaqController;
@@ -32,3 +33,8 @@ Route::get('/contact', [ContactController::class, 'create'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('contact.store');
+
+Route::middleware('auth')->prefix('admin/e-receipts')->name('admin.e-receipts.')->group(function (): void {
+    Route::get('/{paymentReceipt}/preview', [PaymentReceiptDocumentController::class, 'preview'])->name('preview');
+    Route::get('/{paymentReceipt}/download', [PaymentReceiptDocumentController::class, 'download'])->name('download');
+});

@@ -3,7 +3,11 @@
 <dl>
     <dt>Plot preference</dt>
     <dd>{{ $enquiry->plot_label }}</dd>
-    <dt>Published price when submitted</dt>
+    <dt>Requested size</dt>
+    <dd>{{ $enquiry->plot_size_sqm ? number_format($enquiry->plot_size_sqm).' sqm' : 'Not selected' }}</dd>
+    <dt>Rate when submitted</dt>
+    <dd>{{ $enquiry->price_per_sqm_snapshot ? '₦'.number_format($enquiry->price_per_sqm_snapshot).' per sqm' : 'Not selected' }}</dd>
+    <dt>Estimated base land price</dt>
     <dd>{{ $enquiry->price_snapshot ? '₦'.number_format($enquiry->price_snapshot) : 'Not selected' }}</dd>
     <dt>Payment preference</dt>
     <dd>{{ $enquiry->payment_preference }}</dd>
@@ -23,4 +27,5 @@
     <dd>{{ $enquiry->message ?: 'Not supplied' }}</dd>
 </dl>
 
+<p>This is a base-price estimate. Plot availability, taxes, statutory charges, survey fees and development levies remain subject to confirmation.</p>
 <p>This enquiry is saved in the Selotemna admin dashboard.</p>

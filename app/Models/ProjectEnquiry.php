@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class ProjectEnquiry extends Model
@@ -65,6 +67,22 @@ class ProjectEnquiry extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    public function paymentReceipts(): HasMany
+    {
+        return $this->hasMany(PaymentReceipt::class);
+    }
+
+    protected function pricePerSqmSnapshot(): Attribute
+    {
+        return Attribute::get(function (): ?int {
+            if (! $this->plot_size_sqm || ! $this->price_snapshot) {
+                return null;
+            }
+
+            return (int) round($this->price_snapshot / $this->plot_size_sqm);
+        });
     }
 
     public static function statusOptions(): array
