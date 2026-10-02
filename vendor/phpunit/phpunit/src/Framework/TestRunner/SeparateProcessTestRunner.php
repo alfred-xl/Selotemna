@@ -13,8 +13,10 @@ use function assert;
 use function bin2hex;
 use function defined;
 use function get_include_path;
+use function getmypid;
 use function hrtime;
 use function random_bytes;
+use function register_shutdown_function;
 use function serialize;
 use function sprintf;
 use function sys_get_temp_dir;
@@ -121,7 +123,7 @@ final class SeparateProcessTestRunner
         $includePath             = "'." . $includePath . ".'";
         $offset                  = hrtime();
         $serializedConfiguration = $this->saveConfigurationForChildProcess();
-        $processResultFile       = $this->pathForCachedSourceMap();
+        $processResultFile       = $this->createTemporaryFile();
 
         if ($processResultFile === false || $processResultFile === '') {
             // @codeCoverageIgnoreStart
@@ -190,7 +192,16 @@ final class SeparateProcessTestRunner
             return self::$sourceMapFile;
         }
 
-        $path = $this->pathForCachedSourceMap();
+        // the child process only needs the source map for the identification of
+        // issue triggers and for the code coverage filter
+        if (!ConfigurationRegistry::get()->source()->identifyIssueTrigger() &&
+            !CodeCoverage::instance()->isActive()) {
+            self::$sourceMapFile = '';
+
+            return self::$sourceMapFile;
+        }
+
+        $path = $this->createTemporaryFile();
 
         if ($path === false) {
             // @codeCoverageIgnoreStart
@@ -208,6 +219,29 @@ final class SeparateProcessTestRunner
             // @codeCoverageIgnoreEnd
         }
 
+        $pid = getmypid();
+
+        // the source map is written once per test run and shared by all child
+        // processes, so it can only be removed when the test run has ended
+        register_shutdown_function(
+            static function () use ($path, $pid): void
+            {
+                // this runs during PHP's shutdown sequence, after code coverage
+                // data has been collected
+                // @codeCoverageIgnoreStart
+                if (getmypid() !== $pid) {
+                    // a process that was forked, for instance using pcntl_fork(),
+                    // from the process that registered this shutdown function
+                    // inherited it; only the process that created the source map
+                    // may delete it
+                    return;
+                }
+
+                @unlink($path);
+                // @codeCoverageIgnoreEnd
+            },
+        );
+
         self::$sourceMapFile = $path;
 
         return self::$sourceMapFile;
@@ -218,7 +252,7 @@ final class SeparateProcessTestRunner
      */
     private function saveConfigurationForChildProcess(): string
     {
-        $path = $this->pathForCachedSourceMap();
+        $path = $this->createTemporaryFile();
 
         if ($path === false) {
             // @codeCoverageIgnoreStart
@@ -235,7 +269,7 @@ final class SeparateProcessTestRunner
         return $path;
     }
 
-    private function pathForCachedSourceMap(): false|string
+    private function createTemporaryFile(): false|string
     {
         return tempnam(sys_get_temp_dir(), 'phpunit_');
     }

@@ -130,11 +130,11 @@ final class WrapperWorker
 
             foreach ($value as $innerValue) {
                 $phpunitArguments[] = "--{$key}";
-                $phpunitArguments[] = $innerValue;
+                $phpunitArguments[] = (string) $innerValue;
             }
         }
 
-        $phpunitArguments[] = '--do-not-cache-result';
+        $phpunitArguments[] = '--do-not-record-test-run-history';
         $phpunitArguments[] = '--no-logging';
         $phpunitArguments[] = '--no-coverage';
         $phpunitArguments[] = '--no-output';

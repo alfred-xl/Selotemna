@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ContactEnquiries\Tables;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Models\ContactEnquiry;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -45,8 +46,10 @@ class ContactEnquiriesTable
                 ]),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                AdminActionMenu::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

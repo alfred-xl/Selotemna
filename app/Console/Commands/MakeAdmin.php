@@ -28,7 +28,7 @@ class MakeAdmin extends Command
         $validator = Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email:rfc', 'max:255'],
-            'password' => ['required', 'confirmed', Password::min(12)->mixedCase()->numbers()],
+            'password' => ['required', 'confirmed', Password::default()],
         ]);
 
         if ($validator->fails()) {

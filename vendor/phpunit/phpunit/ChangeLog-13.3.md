@@ -2,6 +2,53 @@
 
 All notable changes of the PHPUnit 13.3 release series are documented in this file using the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [13.3.6] - 2026-09-29
+
+### Fixed
+
+* The first attempt of a test that is retried is reported as attempt 1 of 1 in events, instead of attempt 1 of the configured maximum number of attempts
+* The class name argument of `#[RequiresMethod]` is declared as `class-string`, so static analysis reports an error when it refers to a class that does not exist
+* A `#[RequiresMethod]` attribute that refers to a class which cannot be loaded, for instance because its parent class does not exist, aborts the test run instead of skipping the test
+
+## [13.3.5] - 2026-09-25
+
+### Changed
+
+* Control characters and ANSI escape sequences in user-supplied strings such as test names, data set names, and messages are now made visible as `\u{NNNN}` escape sequences instead of being passed through to the terminal
+* Control characters in user-supplied strings are now also made visible in the compact output
+* Line feeds in the name of a test no longer break the header line of a record in the compact output
+
+## [13.3.4] - 2026-09-15
+
+### Fixed
+
+* [#6965](https://github.com/sebastianbergmann/phpunit/issues/6965): Temporary file used by `SourceMapper` may be deleted prematurely
+* The compact output displays details on PHPUnit deprecations and PHPUnit notices even when `--display-phpunit-deprecations` and `--display-phpunit-notices` are not used
+* The summary line of the compact output does not report the number of PHPUnit deprecations, PHPUnit notices, and PHPUnit warnings
+
+## [13.3.3] - 2026-09-09
+
+### Fixed
+
+* Paths of included files are now escaped when generating the code that is executed in a separate process, so that a path containing special characters no longer produces broken code
+* Tests of a test class that is skipped as a whole are missing from the TestDox output
+* A test that is skipped or marked incomplete before it started is missing from the TestDox output
+* A test that is marked incomplete before it started is not counted in the number of tests that ran
+* No progress is printed for a test that is marked incomplete before it started
+
+## [13.3.2] - 2026-08-27
+
+### Fixed
+
+* [#6904](https://github.com/sebastianbergmann/phpunit/issues/6904): `SourceMap` is built in child process even though `identifyIssueTrigger` is disabled
+* [#6924](https://github.com/sebastianbergmann/phpunit/issues/6924): `#[CoversFile]` attribute is not considered for risky test check
+
+## [13.3.1] - 2026-08-13
+
+### Changed
+
+* Invoking a static hook method such as `setUpBeforeClass()` no longer triggers a deprecation warning on PHP 8.6
+
 ## [13.3.0] - 2026-08-07
 
 ### Added
@@ -64,4 +111,10 @@ All notable changes of the PHPUnit 13.3 release series are documented in this fi
 * The test runner no longer aborts with an uncaught `PHPUnit\Runner\Phpt\InvalidPhptFileException` when a PHPT test file has an empty `--FILE--` or `--FILEEOF--` section or a `--FILE_EXTERNAL--` section that references an empty file; such a file is now rejected while it is parsed and reported as an errored test
 * `PHPUnit\Runner\Phpt\InvalidPhptFileException` now has a message that explains why the PHPT test file was rejected
 
+[13.3.6]: https://github.com/sebastianbergmann/phpunit/compare/13.3.5...13.3.6
+[13.3.5]: https://github.com/sebastianbergmann/phpunit/compare/13.3.4...13.3.5
+[13.3.4]: https://github.com/sebastianbergmann/phpunit/compare/13.3.3...13.3.4
+[13.3.3]: https://github.com/sebastianbergmann/phpunit/compare/13.3.2...13.3.3
+[13.3.2]: https://github.com/sebastianbergmann/phpunit/compare/13.3.1...13.3.2
+[13.3.1]: https://github.com/sebastianbergmann/phpunit/compare/13.3.0...13.3.1
 [13.3.0]: https://github.com/sebastianbergmann/phpunit/compare/13.2.6...13.3.0

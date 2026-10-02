@@ -45,3 +45,14 @@ it('creates an approved administrator through the secure console command', funct
         ->and($admin->email_verified_at)->not->toBeNull()
         ->and(Hash::check('SecurePassword123', $admin->password))->toBeTrue();
 });
+
+it('rejects a weak password through the administrator command', function () {
+    $this->artisan('selotemna:make-admin')
+        ->expectsQuestion('Administrator name', 'Selotemna Administrator')
+        ->expectsQuestion('Administrator email', 'admin@selotemna.test')
+        ->expectsQuestion('Password (at least 12 characters)', 'weak-password')
+        ->expectsQuestion('Confirm password', 'weak-password')
+        ->assertFailed();
+
+    expect(User::query()->where('email', 'admin@selotemna.test')->doesntExist())->toBeTrue();
+});

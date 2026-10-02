@@ -5,12 +5,12 @@ namespace App\Filament\Resources\Projects\Tables;
 use App\Enums\ProjectDivision;
 use App\Enums\ProjectPublicationStatus;
 use App\Enums\ProjectStatus;
+use App\Filament\Actions\AdminActionMenu;
 use App\Filament\Actions\PreviewProjectAction;
 use App\Filament\Resources\ProjectEnquiries\ProjectEnquiryResource;
 use App\Filament\Resources\Projects\ProjectResource;
 use App\Models\Project;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -97,7 +97,7 @@ class ProjectsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ActionGroup::make([
+                AdminActionMenu::make([
                     Action::make('viewProject')
                         ->label('View project')
                         ->icon('heroicon-o-eye')
@@ -112,10 +112,6 @@ class ProjectsTable
                         ->icon('heroicon-o-chat-bubble-left-right')
                         ->url(fn (): string => ProjectEnquiryResource::getUrl('index')),
                 ])
-                    ->label('Actions')
-                    ->icon('heroicon-o-ellipsis-horizontal-circle')
-                    ->button()
-                    ->dropdownPlacement('bottom-end')
                     ->visible(fn (Project $record): bool => ! $record->trashed()),
             ])
             ->toolbarActions([

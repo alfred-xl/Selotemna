@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProjectEnquiries\Pages;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Filament\Resources\PaymentReceipts\PaymentReceiptResource;
 use App\Filament\Resources\ProjectEnquiries\ProjectEnquiryResource;
 use App\Models\ProjectEnquiry;
@@ -16,11 +17,13 @@ class ViewProjectEnquiry extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('generateReceipt')
-                ->label('Generate e-receipt')
-                ->icon('heroicon-o-document-currency-dollar')
-                ->url(fn (ProjectEnquiry $record): string => PaymentReceiptResource::getUrl('create', ['project_enquiry' => $record->getKey()])),
-            EditAction::make(),
+            AdminActionMenu::make([
+                Action::make('generateReceipt')
+                    ->label('Generate e-receipt')
+                    ->icon('heroicon-o-document-currency-dollar')
+                    ->url(fn (ProjectEnquiry $record): string => PaymentReceiptResource::getUrl('create', ['project_enquiry' => $record->getKey()])),
+                EditAction::make(),
+            ]),
         ];
     }
 }

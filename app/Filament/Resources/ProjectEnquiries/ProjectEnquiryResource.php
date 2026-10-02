@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ProjectEnquiries;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Filament\Resources\PaymentReceipts\PaymentReceiptResource;
 use App\Filament\Resources\ProjectEnquiries\Pages\EditProjectEnquiry;
 use App\Filament\Resources\ProjectEnquiries\Pages\ListProjectEnquiries;
@@ -169,12 +170,14 @@ class ProjectEnquiryResource extends Resource
                 ]),
             ])
             ->recordActions([
-                Action::make('generateReceipt')
-                    ->label('Generate e-receipt')
-                    ->icon('heroicon-o-document-currency-dollar')
-                    ->url(fn (ProjectEnquiry $record): string => PaymentReceiptResource::getUrl('create', ['project_enquiry' => $record->getKey()])),
-                ViewAction::make(),
-                EditAction::make(),
+                AdminActionMenu::make([
+                    Action::make('generateReceipt')
+                        ->label('Generate e-receipt')
+                        ->icon('heroicon-o-document-currency-dollar')
+                        ->url(fn (ProjectEnquiry $record): string => PaymentReceiptResource::getUrl('create', ['project_enquiry' => $record->getKey()])),
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

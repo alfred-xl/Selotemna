@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PaymentReceipts;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Filament\Resources\PaymentReceipts\Pages\CreatePaymentReceipt;
 use App\Filament\Resources\PaymentReceipts\Pages\EditPaymentReceipt;
 use App\Filament\Resources\PaymentReceipts\Pages\ListPaymentReceipts;
@@ -11,7 +12,6 @@ use App\Models\Project;
 use App\Models\ProjectEnquiry;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
@@ -215,7 +215,7 @@ class PaymentReceiptResource extends Resource
                 SelectFilter::make('project_id')->label('Project')->relationship('project', 'name'),
             ])
             ->recordActions([
-                ActionGroup::make([
+                AdminActionMenu::make([
                     ViewAction::make(),
                     EditAction::make()->visible(fn (PaymentReceipt $record): bool => $record->isDraft()),
                     Action::make('previewReceipt')
@@ -229,7 +229,7 @@ class PaymentReceiptResource extends Resource
                         ->url(fn (PaymentReceipt $record): string => route('admin.e-receipts.download', $record))
                         ->openUrlInNewTab()
                         ->visible(fn (PaymentReceipt $record): bool => ! $record->isDraft()),
-                ])->label('Actions')->button()->dropdownPlacement('bottom-end'),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

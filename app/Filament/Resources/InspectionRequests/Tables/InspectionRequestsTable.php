@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\InspectionRequests\Tables;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Models\InspectionRequest;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -41,8 +42,10 @@ class InspectionRequestsTable
                 ]),
             ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
+                AdminActionMenu::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

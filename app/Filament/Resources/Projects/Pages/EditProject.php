@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Projects\Pages;
 
+use App\Filament\Actions\AdminActionMenu;
 use App\Filament\Actions\PreviewProjectAction;
 use App\Filament\Resources\Projects\Pages\Concerns\ValidatesProjectPublication;
 use App\Filament\Resources\Projects\ProjectResource;
@@ -20,11 +21,13 @@ class EditProject extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            PreviewProjectAction::make(),
-            ViewAction::make(),
-            DeleteAction::make(),
-            ForceDeleteAction::make(),
-            RestoreAction::make(),
+            AdminActionMenu::make([
+                PreviewProjectAction::make(),
+                ViewAction::make(),
+                DeleteAction::make(),
+                ForceDeleteAction::make(),
+                RestoreAction::make(),
+            ]),
         ];
     }
 
